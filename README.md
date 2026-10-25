@@ -16,6 +16,16 @@
 
 Painel interativo com resultados oficiais do Tribunal Superior Eleitoral (TSE).
 
+## Percentual de seções totalizadas (25/10/2026)
+
+- Painel presidencial: percentual oficial e número de seções totalizadas/total no Brasil, nas UFs, nos municípios e nas zonas consultadas.
+- Painel de governador: percentual e contagem em cada um dos seis estados, municípios e zonas; resumo dos seis estados ponderado pelo **total de seções**, somente quando os seis arquivos oficiais estiverem disponíveis.
+- Mapa do exterior: percentual e contagem no total mundial de votação brasileira (agregado oficial ZZ), por país e por cidade eleitoral.
+- Total por país é calculado como **soma de seções totalizadas das cidades / soma de seções das cidades**, sem média simples de percentuais. Países com consultas municipais incompletas exibem `—` e aviso de parcialidade, para evitar percentuais falsamente altos.
+- Indicadores usam `s.ts` (seções totais), `s.st` (seções totalizadas) e `s.pst` (percentual oficial) dos arquivos do TSE. O avanço exibido é de *seções totalizadas*, não de votos contados ou equipamentos físicos em operação.
+- Percentual `0,00%` só aparece quando o TSE informa a situação. Na falta de arquivo/dados, o indicador mostra `—`.
+
+---
 ## Páginas do projeto
 
 - **[Mapa presidencial detalhado](./mapa.html)**: mapa de calor nacional, filtros de estado, cidade, zona, seção e zoom municipal.
