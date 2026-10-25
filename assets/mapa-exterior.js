@@ -77,14 +77,31 @@ function parseVotes(json){
  if(!lula||!bolso)throw Error("Candidatos não encontrados");
  const lv=n(lula.vap),bv=n(bolso.vap),valid=n(json.v&&json.v.vv);
  const available=valid>0&&(lv+bv)>0;
- return {lula:lv,bolso:bv,valid,available,total:n(json.s?.ts),counted:n(json.s?.st),
-   progress:n(json.s?.pst),at:(json.dg||"")+" "+(json.hg||""), round:json.t||null};
+ const st=json.s||{},total=st.ts!==undefined&&st.ts!==null?n(st.ts):null;
+ const counted=st.st!==undefined&&st.st!==null?n(st.st):null;
+ const officialPercent=st.pst!==undefined&&st.pst!==null&&st.pst!==""?n(st.pst):null;
+ const computed=total>0&&counted!==null?100*counted/total:null;
+ return {lula:lv,bolso:bv,valid,available,total,counted,known:total!==null&&counted!==null&&total>0,
+   progress:officialPercent!==null?officialPercent:computed,at:(json.dg||"")+" "+(json.hg||""),round:json.t||null};
 }
 function add(a,b){return {lula:(a.lula||0)+(b.lula||0),bolso:(a.bolso||0)+(b.bolso||0),valid:(a.valid||0)+(b.valid||0),
   total:(a.total||0)+(b.total||0),counted:(a.counted||0)+(b.counted||0),available:true}}
 function votePercent(v){return v&&v.valid?100*v.lula/v.valid:0}
 function otherPercent(v){return v&&v.valid?100*v.bolso/v.valid:0}
 function margin(v){return votePercent(v)-otherPercent(v)}
+// Para um país, exigir todas as localidades: uma média simples de percentuais não representa a apuração.
+function sectionPct(v){
+ if(!v)return null;
+ if(typeof v.expected==="number" && (v.reports!==v.expected || !v.known))return null;
+ if(v.total>0&&v.counted!==null&&v.counted!==undefined)return 100*v.counted/v.total;
+ return Number.isFinite(v.progress)?v.progress:null;
+}
+function sectionDescription(v){
+ const p=sectionPct(v);
+ if(p===null)return "Seções totalizadas: —"+(v&&v.expected?" (parcial, "+(v.reports||0)+"/"+v.expected+" localidades lidas)":"");
+ const frac=v&&v.total!==null&&v.counted!==null?" · "+count(v.counted)+" de "+count(v.total)+" seções":"";
+ return "Seções totalizadas: "+percent(p)+frac;
+}
 function heat(v){
  if(!v||!v.available||v.valid<=0||Math.abs(margin(v))<0.005)return "#17261c";
  const advantage=Math.abs(margin(v)),power=Math.pow(Math.min(advantage/35,1),.75);
@@ -225,12 +242,12 @@ function countryVotes(iso){return state.roundResults.get(iso)}
 function infoTooltip(iso){
  const country=state.eligible.get(iso),v=countryVotes(iso);
  if(!country)return "";
- return "<b>"+esc(country.name)+"</b><small>"+country.cities.length+" local(is) com seção eleitoral</small>"+
+ return "<b>"+esc(country.name)+"</b><small>"+country.cities.length+" localidades com seção</small>"+
     (v&&v.valid?
       "<div>Lula <strong style='color:#f04a56'>"+percent(votePercent(v))+"</strong></div>"+
-      "<div>Flávio Bolsonaro <strong style='color:#16d077'>"+percent(otherPercent(v))+"</strong></div>"+
-      "<small>Votos válidos de "+(v.received||0)+"/"+country.cities.length+" locais recebidos</small>"
-      :"<small>Sem votos oficiais disponíveis no turno selecionado</small>");
+      "<div>Flávio Bolsonaro <strong style='color:#16d077'>"+percent(otherPercent(v))+"</strong></div>"
+      :"<small>Sem votos oficiais disponíveis no turno selecionado</small>")+
+      "<small><b>"+esc(sectionDescription(v))+"</b></small>";
 }
 function showTooltip(iso,event){
  const tooltip=$("tooltip");tooltip.innerHTML=infoTooltip(iso);tooltip.classList.add("show");
@@ -253,6 +270,10 @@ function updateDetail(v,title,description){
  $("difference").textContent=v&&v.available?percent(Math.abs(margin(v)))+" p.p.":"—";
  $("leader").textContent=v&&v.available?
    (margin(v)>0?"Lula":margin(v)<0?"Flávio Bolsonaro":"Empate entre os dois"):"Sem votos";
+ const p=sectionPct(v);
+ $("detailProgress").textContent=p===null?"—":percent(p);
+ $("detailSectionCount").textContent=sectionDescription(v);
+ $("detailProgressBar").style.width=p===null?"0%":Math.max(0,Math.min(100,p))+"%";
 }
 function renderSelected(){
  const item=state.selected?state.eligible.get(state.selected):null;
@@ -272,6 +293,9 @@ function renderSelected(){
    const row=state.cityRows.get(city.code);
    let info=row&&row.available?
      count(row.lula)+" Lula · "+count(row.bolso)+" Flávio":"Aguardando votos";
+   const sections=sectionPct(row);
+   info+=" · "+(sections===null?"—":percent(sections))+" seções";
+   if(row&&row.known)info+=" ("+count(row.counted)+"/"+count(row.total)+")";
    return "<div class='cityrow'><span>"+esc(city.name)+"</span><small>"+info+"</small></div>";
  });
  $("cityList").innerHTML=parts.join("")||"<p class='muted'>Nenhuma cidade cadastrada.</p>";
@@ -299,7 +323,8 @@ function renderList(){
  const listed=eligible.filter(item=>!q||norm(item.name).includes(q)).slice(0,140);
  $("countriesList").innerHTML=listed.map(item=>{
    const v=countryVotes(item.iso2),valid=!!(v&&v.available);
-   const detail=valid?percent(Math.abs(margin(v)))+" p.p.":"Sem votos";
+   const sections=sectionPct(v);
+   const detail=sections===null?"— seções":percent(sections)+" seções";
    return '<button class="countryrow '+(state.selected===item.iso2?"current":"")+'" data-iso="'+item.iso2+'" type="button">'+
      '<span><i class="dot" style="background:'+heat(v)+'"></i>'+esc(item.name)+'</span>'+
      '<small>'+detail+'</small></button>'
@@ -311,13 +336,14 @@ async function fetchZZ(turn,token){
    const v=parseVotes(await get(overseasUrl(turn),21000));
    if(token!==state.revision)return;
    state.zz=v;
-   $("overseasProgress").textContent=percent(v.progress);
+   $("overseasProgress").textContent=sectionPct(v)===null?"—":percent(sectionPct(v));
+   $("worldFraction").textContent=sectionDescription(v);
    $("lulaWorld").textContent=v.available?percent(votePercent(v)):"—";
    $("bolsoWorld").textContent=v.available?percent(otherPercent(v)):"—";
  }catch(e){
    if(token!==state.revision)return;
    state.zz=null;
-   $("overseasProgress").textContent="—";$("lulaWorld").textContent="—";$("bolsoWorld").textContent="—";
+   $("overseasProgress").textContent="—";$("worldFraction").textContent="Seções totalizadas: dados indisponíveis";$("lulaWorld").textContent="—";$("bolsoWorld").textContent="—";
  }
  renderSelected();
 }
@@ -331,7 +357,7 @@ async function fetchCountryResults(force){
  let done=0,success=0,failed=0,index=0;
  const cities=[...state.eligible.values()].flatMap(country=>country.cities.map(city=>({...city,iso:country.iso2})));
  const byCountry=new Map();
- for(const country of state.eligible.values())byCountry.set(country.iso2,{lula:0,bolso:0,valid:0,received:0,expected:country.cities.length,available:false});
+ for(const country of state.eligible.values())byCountry.set(country.iso2,{lula:0,bolso:0,valid:0,received:0,reports:0,expected:country.cities.length,known:true,total:0,counted:0,available:false});
  const zzPromise=fetchZZ(turn,token);
  async function worker(){
    while(index<cities.length&&token===state.revision){
@@ -340,12 +366,15 @@ async function fetchCountryResults(force){
        const votes=parseVotes(await get(resultUrl(city.code,turn),19000));
        if(token!==state.revision)return;
        state.cityRows.set(city.code,votes);
+       const agg=byCountry.get(city.iso);
+       agg.reports++;
+       if(votes.known){agg.total+=votes.total;agg.counted+=votes.counted}
+       else agg.known=false;
        if(votes.available){
-         const agg=byCountry.get(city.iso);
          agg.lula+=votes.lula;agg.bolso+=votes.bolso;agg.valid+=votes.valid;
          agg.received++;agg.available=true;success++;
-         state.roundResults.set(city.iso,{...agg});
        }
+       state.roundResults.set(city.iso,{...agg});
      }catch(e){failed++}
      done++;
      if(done%4===0||done===cities.length){
@@ -373,7 +402,7 @@ async function chooseTurn(turn){
  $("firstTurn").classList.toggle("active",turn===1);
  $("secondTurn").classList.toggle("active",turn===2);
  $("turnTitle").textContent=turn===1?"1º TURNO · 04/10/2026":"2º TURNO · 25/10/2026";
- $("lulaWorld").textContent="—";$("bolsoWorld").textContent="—";$("overseasProgress").textContent="—";
+ $("lulaWorld").textContent="—";$("bolsoWorld").textContent="—";$("overseasProgress").textContent="—";$("worldFraction").textContent="Aguardando seções do TSE";
  await fetchCountryResults(true);
 }
 function stopTour(){
