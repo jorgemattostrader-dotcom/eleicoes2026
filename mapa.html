@@ -90,6 +90,13 @@ body.obs .grid{grid-template-columns:minmax(0,2fr) minmax(300px,.6fr)}
 @media(max-width:1100px){.grid{grid-template-columns:1fr}.searchgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.searchgrid .button{align-self:end}.maparea svg{max-height:580px}}
 @media(max-width:680px){.shell{padding:12px}.headerbrand{gap:10px}.logo{width:57px;height:55px}.header h1{font-size:24px}.subtitle{font-size:11px}.searchgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:12px}.stat strong{font-size:23px}.maparea svg{min-height:260px}.panelhead{padding:14px}.legend{padding:12px 14px;gap:9px}.caption{padding:12px 14px}.side{padding:15px}.turnlabel{margin-left:0}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+
+.viewtabs{display:flex;align-items:center;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.viewtab{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:1px solid #385b45;border-radius:11px;background:#12241a;color:#bed3c3;padding:12px 17px;font-size:12px;font-weight:900;letter-spacing:.02em}
+.viewtab.active{background:#076a3f;border-color:#17a368;color:#fff}
+.viewtab:hover{background:#1e4831;color:white}
+body.obs .viewtabs{display:none}
+
 </style>
 </head>
 <body>
@@ -106,6 +113,10 @@ body.obs .grid{grid-template-columns:minmax(0,2fr) minmax(300px,.6fr)}
   <div class="toolbar-row"><span id="status" class="status">Iniciando...</span><button id="obsBtn" class="button secondary" type="button">MODO OBS</button></div>
 </header>
 
+<nav class="viewtabs" aria-label="Painéis eleitorais">
+  <a class="viewtab active" href="./mapa.html" aria-current="page">PRESIDENTE · MAPA DE CALOR</a>
+  <a class="viewtab" href="./governador.html">2º TURNO GOVERNADOR</a>
+</nav>
 <div class="toolbar">
   <div class="toolbar-row">
     <button id="turn2" class="button active" type="button">2º TURNO · 25/10</button>
