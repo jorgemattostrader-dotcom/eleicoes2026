@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07100b">
+<meta name="description" content="Mapa mundial de calor: resultados presidenciais dos brasileiros no exterior nas Eleições 2026, somente países com seções eleitorais oficiais.">
+<title>Votação no Exterior | Mapa Mundial CMG</title>
+<style>
+:root{color-scheme:dark;--bg:#07110c;--panel:#0f1d14;--border:#294d36;--text:#f4f9f5;--muted:#9db2a2;--red:#f04854;--green:#12d077}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 12% 2%,#123721 0,transparent 34%),radial-gradient(ellipse at 97% 40%,#2a171a 0,transparent 40%),var(--bg);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
+button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #9cf5bb;outline-offset:2px}
+.wrapper{max-width:1700px;margin:auto;padding:22px 25px 26px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:16px}
+.logo{width:88px;height:77px;border:1px solid var(--border);border-radius:16px;background:#0d1e13;overflow:hidden;display:grid;place-items:center;font-weight:950;font-size:21px}
+.logo img{width:100%;height:100%;object-fit:contain}.logo img.broken{display:none}.logo .fallback{display:none}.logo img.broken+.fallback{display:block}
+.kicker{font-size:10px;font-weight:900;letter-spacing:.16em;color:#88e1ad}
+h1{font-size:clamp(27px,3.5vw,49px);line-height:1.02;letter-spacing:-.05em;margin:6px 0}
+.sub,.muted{color:var(--muted);font-size:12px}
+.sub{line-height:1.5}.head-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.status{border:1px solid #4f694a;border-radius:30px;padding:11px 14px;font-size:11px;font-weight:900;color:#e8c385;background:#142218}
+.status[data-level="ok"]{border-color:#2b9f60;color:#83ecad}.status[data-level="warn"]{border-color:#aa8043;color:#e9c48e}
+.button{display:inline-flex;align-items:center;justify-content:center;padding:11px 14px;min-height:41px;border-radius:11px;border:1px solid #3b6548;background:#142c1d;font-size:11px;font-weight:900;color:#fff;white-space:nowrap;transition:background .2s ease,transform .2s ease}
+.button:hover{background:#24583a;transform:translateY(-1px)}.button.active,.button.primary{background:#096d43;border-color:#25b671}.button:disabled{opacity:.5}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 12px}
+.tab{border:1px solid #42684b;border-radius:11px;background:#142819;color:#c6ddca;padding:11px 16px;text-decoration:none;font-size:12px;font-weight:900}
+.tab.current,.tab:hover{background:#086c41;color:#fff;border-color:#2eb678}
+.filters{border:1px solid var(--border);border-radius:16px;background:#101f15;padding:13px;display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:12px}
+.search-group{display:flex;align-items:center;gap:7px;flex:1;min-width:220px}
+.search-group label{font-size:10px;text-transform:uppercase;font-weight:850;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
+.search-group input{width:100%;background:#09170e;color:#fff;border:1px solid #4b6d55;border-radius:10px;min-height:41px;padding:10px 13px;font-size:12px}
+.turn{font-size:11px;color:#95cbaa;font-weight:900}
+.notice{display:none;border:1px solid #3f604b;background:#122719;padding:12px 14px;border-radius:12px;color:#d6ebd9;margin:0 0 12px;font-size:12px;line-height:1.5}
+.notice.visible{display:block}.notice.warn{background:#322818;color:#f0d7ad;border-color:#80663f}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:13px}
+.stat{border:1px solid var(--border);border-radius:17px;background:linear-gradient(160deg,#15291b,#0c1810);padding:16px;min-width:0}
+.stat small{font-size:10px;color:#b0c2b1;font-weight:900;letter-spacing:.1em}
+.stat strong{display:block;margin:8px 0 5px;font-size:clamp(21px,2.6vw,37px);letter-spacing:-.045em}
+.stat strong.red{color:var(--red)}.stat strong.green{color:var(--green)}.stat span{font-size:10px;color:#95ad9b}
+.layout{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(310px,.7fr);gap:12px}
+.panel{border:1px solid var(--border);border-radius:21px;background:linear-gradient(145deg,#122217,#0b180f);min-width:0;overflow:hidden}
+.panelhead{padding:18px 20px 9px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.panelhead h2{font-size:18px;margin:5px 0 0}.panelhead .sub{font-size:10px}
+#mapbox{position:relative;background:radial-gradient(circle at 50% 50%,#1542292e,transparent 55%)}
+#map{width:100%;display:block;min-height:360px;max-height:650px}
+.country{stroke:#35543d;stroke-width:.8;vector-effect:non-scaling-stroke;transition:fill 1.6s ease,stroke .2s ease,filter .2s ease}
+.country.eligible{cursor:pointer;stroke:#96b79b}.country.selected,.country.eligible:hover,.country.eligible:focus{stroke:#fff!important;stroke-width:2.6;filter:drop-shadow(0 0 5px #fff7);outline:none}
+.pin{cursor:pointer;transition:fill 1.6s ease}.pin.selected,.pin:hover,.pin:focus{stroke:#fff;stroke-width:3;outline:none}
+.tooltip{display:none;z-index:9;position:absolute;pointer-events:none;width:208px;border:1px solid #578468;background:#081910f6;padding:12px 15px;color:#fff;box-shadow:0 15px 35px #000a;border-radius:13px;font-size:12px;line-height:1.6}
+.tooltip.show{display:block}.tooltip b{font-size:14px}.tooltip small{display:block;color:#a7bbae;margin:4px 0}.tooltip div{display:flex;justify-content:space-between;gap:10px}
+.legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:14px 18px;font-size:11px;color:#bdd5c3}
+.sw{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border-radius:3px}
+.sw.red{background:var(--red)}.sw.green{background:var(--green)}.sw.gray{background:#1c2e20;border:1px solid #779281}
+.loadingbar{height:5px;background:#203927;border-radius:5px;margin:0 19px;overflow:hidden}.loadingbar .fill{background:#4fe394;width:0;height:100%;transition:width .4s ease}
+.mapfoot{font-size:11px;color:#a7bca9;line-height:1.6;padding:13px 19px 17px}
+.mapfoot .row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:7px}
+.side{padding:18px}
+.side h3{font-size:23px;letter-spacing:-.04em;margin:7px 0}
+.detailMeta{font-size:11px;color:#a9c1ae;line-height:1.5;min-height:33px}
+.person{margin:18px 0}.person .name{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900}
+.person .votes{font-size:11px;color:#a2bca7;margin:8px 0}
+.track{height:11px;border-radius:10px;background:#1d3b28;overflow:hidden}
+.track .fill{height:100%;width:0;border-radius:10px;transition:width 1.6s ease}
+.track .red{background:linear-gradient(90deg,#7b222b,var(--red))}.track .green{background:linear-gradient(90deg,#0d6639,var(--green))}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.metrics div{padding:12px;border-radius:11px;border:1px solid #35523b;background:#12271a}
+.metrics small{display:block;font-size:10px;color:#9eb5a1}.metrics b{display:block;font-size:14px;margin-top:7px;overflow-wrap:anywhere}
+.divider{height:1px;background:#264b34;margin:18px 0}.h4{font-size:11px;font-weight:900;letter-spacing:.1em;margin-bottom:10px}
+.cityList{border:1px solid #2e5139;border-radius:11px;background:#0c2013;max-height:230px;overflow:auto}
+.cityrow{display:flex;justify-content:space-between;gap:8px;padding:9px 10px;border-bottom:1px solid #254530;font-size:12px}
+.cityrow:last-child{border-bottom:0}.cityrow small{font-size:10px;color:#aac1ae;text-align:right}
+.countrylist{display:grid;gap:5px;max-height:300px;overflow:auto}
+.countryrow{display:flex;justify-content:space-between;gap:8px;align-items:center;background:#12291b;color:#f2f8f3;border:1px solid #294e35;border-radius:9px;padding:9px 11px;font-size:12px;text-align:left}
+.countryrow:hover,.countryrow.current{background:#25653e;border-color:#62a877}.countryrow .dot{display:inline-block;width:9px;height:9px;border:1px solid #a1bba6;border-radius:3px;margin-right:7px}
+.countryrow small{color:#acd0b7}
+footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:10px;color:#a3b5a5;line-height:1.5;margin-top:15px}
+footer a{color:#84e0aa}
+.obs .tabs,.obs .filters,.obs footer,.obs .countrylistwrap{display:none}.obs .wrapper{max-width:1900px}.obs .layout{grid-template-columns:2fr .7fr}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.countrylist{max-height:220px}}
+@media(max-width:660px){.wrapper{padding:12px}.brand{gap:9px}.logo{width:59px;height:57px}h1{font-size:26px}.kicker{font-size:8px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:12px}.stat strong{font-size:26px}.search-group{min-width:100%}.panelhead{padding:14px}.mapfoot{padding:11px 14px}#map{min-height:280px}.side{padding:14px}.tab{font-size:10px;padding:10px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<header class="head">
+  <div class="brand"><div class="logo"><img src="assets/cmg-logo-minimal.jpg" alt="Chapecó Mil Grau" onerror="this.classList.add('broken')"><span class="fallback">CMG</span></div>
+  <div><div class="kicker">CHAPECÓ MIL GRAU · ELEIÇÕES 2026</div><h1>MAPA DE CALOR MUNDIAL</h1>
+  <div class="sub">Votação dos brasileiros no exterior · apenas países com seções eleitorais verificadas</div></div></div>
+  <div class="head-actions"><span id="status" class="status">Carregando...</span><button id="obs" class="button" type="button">MODO OBS</button></div>
+</header>
+<nav class="tabs" aria-label="Painéis eleitorais">
+  <a class="tab" href="./mapa.html">PRESIDENTE · BRASIL</a>
+  <a class="tab" href="./governador.html">2º TURNO GOVERNADOR</a>
+  <a class="tab current" href="./mundo.html" aria-current="page">VOTAÇÃO NO EXTERIOR · MUNDO</a>
+</nav>
+<div class="filters">
+  <button id="secondTurn" class="button active" type="button">2º TURNO · 25/10</button>
+  <button id="firstTurn" class="button" type="button">1º TURNO · 04/10</button>
+  <div class="search-group"><label for="searchCountry">País</label><input id="searchCountry" type="search" list="countryOptions" placeholder="Ex.: Portugal, Japão, Estados Unidos" autocomplete="off"><datalist id="countryOptions"></datalist></div>
+  <button id="searchBtn" class="button primary" type="button">⌕ BUSCAR E APROXIMAR</button>
+  <button id="reset" class="button" type="button">VER MUNDO</button>
+  <button id="tour" class="button" type="button">▶ TOUR PELOS PAÍSES</button>
+  <button id="refresh" class="button" type="button">↻ ATUALIZAR TSE</button>
+  <span id="turnTitle" class="turn">2º TURNO · 25/10/2026</span>
+</div>
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+<section class="stats">
+  <div class="stat"><small>LULA · EXTERIOR</small><strong class="red" id="lulaWorld">—</strong><span>Votos válidos · TSE ZZ</span></div>
+  <div class="stat"><small>FLÁVIO BOLSONARO · EXTERIOR</small><strong class="green" id="bolsoWorld">—</strong><span>Votos válidos · TSE ZZ</span></div>
+  <div class="stat"><small>APURAÇÃO NO EXTERIOR</small><strong id="overseasProgress">—</strong><span>Seções totalizadas</span></div>
+  <div class="stat"><small>PAÍSES COM SEÇÕES</small><strong id="eligibleCountries">—</strong><span>Cadastro de seções confirmado</span></div>
+  <div class="stat"><small>LOCALIDADES ELEITORAIS</small><strong id="eligibleCities">—</strong><span>Localidades com seções no TSE</span></div>
+</section>
+<main class="layout">
+  <section class="panel">
+    <div class="panelhead">
+      <div><div class="kicker">RESULTADOS PRESIDENCIAIS NO EXTERIOR</div><h2 id="mapLabel">MUNDO · LOCAIS DE VOTAÇÃO BRASILEIROS</h2></div>
+      <div class="sub">Clique num país para aproximar</div>
+    </div>
+    <div id="mapbox"><svg id="map" viewBox="0 0 1000 540" role="img" aria-label="Mapa-múndi dos países com seções eleitorais brasileiras"><g id="land"></g><g id="pins"></g></svg><div id="tooltip" class="tooltip" role="tooltip"></div></div>
+    <div class="legend">
+      <span><i class="sw red"></i>Maior votação de Lula</span>
+      <span><i class="sw green"></i>Maior votação de Flávio Bolsonaro</span>
+      <span><i class="sw gray"></i>Sem votos ou seções</span>
+      <span class="muted">Cor mais forte = vantagem percentual maior</span>
+    </div>
+    <div class="loadingbar"><div class="fill" id="progressBar"></div></div>
+    <div class="mapfoot">
+      <div class="row"><span id="requests">Aguardando votação oficial...</span><span id="lastUpdate"></span><span id="withVotes" style="display:none"></span></div>
+      <div id="landNotice">Conferindo localidades oficiais com seção eleitoral.</div>
+      <div style="margin-top:7px">Os percentuais por país somam as localidades com votos oficiais disponíveis e podem ser parciais. Territórios pequenos sem contorno no mapa são representados por um ponto. Países sem seção eleitoral confirmada ficam neutros.</div>
+    </div>
+  </section>
+  <aside class="panel side">
+    <div class="kicker" id="detailScope">EXTERIOR / GERAL</div>
+    <h3 id="detailTitle">Exterior · total TSE</h3>
+    <div class="detailMeta" id="detailMeta">Clique em um país para acompanhar a apuração.</div>
+    <div class="person"><div class="name"><span style="color:var(--red)">LULA</span><span id="lulaPct">—</span></div><div id="lulaVotes" class="votes">— votos</div><div class="track"><div id="lulaBar" class="fill red"></div></div></div>
+    <div class="person"><div class="name"><span style="color:var(--green)">FLÁVIO BOLSONARO</span><span id="bolsoPct">—</span></div><div id="bolsoVotes" class="votes">— votos</div><div class="track"><div id="bolsoBar" class="fill green"></div></div></div>
+    <div class="metrics"><div><small>VOTOS VÁLIDOS</small><b id="totalValid">—</b></div><div><small>VANTAGEM</small><b id="difference">—</b></div><div style="grid-column:1/-1"><small>MAIOR VOTAÇÃO ENTRE OS DOIS</small><b id="leader">Sem votos</b></div></div>
+    <div class="divider"></div>
+    <div class="h4">CIDADES COM LOCAL DE VOTAÇÃO</div>
+    <div id="cityList" class="cityList"><p class="muted" style="padding:10px">Selecione um país.</p></div>
+    <div class="divider"></div>
+    <div class="countrylistwrap">
+      <div class="h4">PAÍSES COM SEÇÕES CONFIRMADAS</div>
+      <div id="countriesList" class="countrylist"><span class="muted">Verificando cadastros...</span></div>
+      <div class="muted" style="font-size:10px;line-height:1.5;margin-top:10px" id="registerNote"></div>
+    </div>
+  </aside>
+</main>
+<footer>
+  <span>Fonte da votação: <a href="https://resultados.tse.jus.br/" target="_blank" rel="noopener">TSE · dados oficiais de 2026</a>, cadastros EA12 e EA16. Base cartográfica: <a href="https://github.com/johan/world.geo.json" target="_blank" rel="noopener">Natural Earth / world.geo.json</a>. Correspondência de localidades: projeto de apuração pública, validada pelos códigos TSE.</span>
+  <span><a href="./mapa.html">Brasil</a> · <a href="./governador.html">Governadores</a> · <a href="./exterior.html">Painel exterior anterior</a></span>
+</footer>
+</div>
+<script src="assets/mapa-exterior.js" defer></script>
+</body>
+</html>
