@@ -97,6 +97,7 @@ body.obs .grid{grid-template-columns:minmax(0,2fr) minmax(300px,.6fr)}
 .viewtab:hover{background:#1e4831;color:white}
 body.obs .viewtabs{display:none}
 
+.sectionsTrack{height:6px;border-radius:30px;background:#2c4230;overflow:hidden;margin-top:7px}.sectionsFill{background:linear-gradient(90deg,#1aaf66,#79eaa4);height:100%;width:0;transition:width 1s ease}
 </style>
 </head>
 <body>
@@ -144,7 +145,7 @@ body.obs .viewtabs{display:none}
 <section class="stats" aria-label="Resumo da eleição">
   <div class="stat"><small>LULA · BRASIL</small><strong id="nationalLula" class="red">—</strong><div class="micro">Presidência · votos válidos</div></div>
   <div class="stat"><small>FLÁVIO BOLSONARO · BRASIL</small><strong id="nationalBolso" class="green">—</strong><div class="micro">Presidência · votos válidos</div></div>
-  <div class="stat"><small>APURAÇÃO NACIONAL</small><strong id="nationalProgress">—</strong><div class="micro" id="hintTurn">Fonte: TSE</div></div>
+  <div class="stat"><small>APURAÇÃO NACIONAL</small><strong id="nationalProgress">—</strong><div class="micro" id="nationalSections">Seções totalizadas · TSE</div><div class="micro" id="hintTurn">Fonte: TSE</div></div>
   <div class="stat"><small>ARQUIVOS OFICIAIS</small><strong id="ufCounter">0/28</strong><div class="micro" id="lastUpdate">Ainda não consultado</div></div>
 </section>
 
@@ -190,7 +191,7 @@ body.obs .viewtabs{display:none}
     <div class="split"></div>
     <div class="metrics">
       <div class="metric"><small>VANTAGEM</small><b id="difference">—</b></div>
-      <div class="metric"><small>SEÇÕES APURADAS</small><b id="counted">—</b></div>
+      <div class="metric"><small>SEÇÕES TOTALIZADAS</small><b id="counted">—</b><small id="sectionsFraction" style="margin-top:6px;display:block">Aguardando contagem TSE</small><div class="sectionsTrack"><div id="sectionProgressBar" class="sectionsFill"></div></div></div>
       <div class="metric" style="grid-column:1/-1"><small>CANDIDATO À FRENTE</small><b id="leader">Sem votos</b></div>
     </div>
     <div class="section">
