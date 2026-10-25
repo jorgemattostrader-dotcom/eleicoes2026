@@ -39,7 +39,26 @@ function validCandidates(doc){
     party1:String(first.__party||""),party2:String(second.__party||""),
     valid:vv,lp:available?100*lv/denominator:0,bp:available?100*bv/denominator:0,
     margin:available?100*(lv-bv)/denominator:0,available,
-    progress:num(doc.s&&doc.s.pst),dg:doc.dg||"",hg:doc.hg||"",dv:doc.dv||""};
+    ...totalization(doc.s),dg:doc.dg||"",hg:doc.hg||"",dv:doc.dv||""};
+}
+function totalization(s){
+  // TSE: s.ts = total de seções; s.st = seções totalizadas; s.pst = percentual oficial.
+  const hasTotal=s&&s.ts!==undefined&&s.ts!==null;
+  const hasCount=s&&s.st!==undefined&&s.st!==null;
+  const total=hasTotal?num(s.ts):null,done=hasCount?num(s.st):null;
+  const hasPct=s&&s.pst!==undefined&&s.pst!==null&&s.pst!=="";
+  const parsedPct=hasPct?num(s.pst):null;
+  const computed=total>0&&done!==null?100*done/total:null;
+  const percentage=hasPct?parsedPct:computed;
+  return {sectionsTotal:total,sectionsDone:done,progress:percentage,
+    progressKnown:Number.isFinite(percentage)&&percentage!==null};
+}
+function sectionLabel(d){
+  if(!d||!d.progressKnown)return "Seções totalizadas: dados indisponíveis";
+  let out="Seções totalizadas: "+pct(d.progress);
+  if(d.sectionsTotal!==null&&d.sectionsDone!==null)
+    out+=" ("+fmt(d.sectionsDone)+" de "+fmt(d.sectionsTotal)+")";
+  return out;
 }
 function color(d){
   if(!d||!d.available||Math.abs(d.margin)<.005)return "#1a2a20";
@@ -131,9 +150,9 @@ function tooltip(target,ev){
   const result=city?state.cityData.get(state.turn+"-"+city.ibge):state.ufData[uf];
   const title=city?city.nome+" / "+uf:UF[uf]||uf;
   S("tooltip").innerHTML="<b>"+esc(title)+"</b>"+(result&&result.available?
-    "<span>"+esc(result.name1)+": "+pct(result.lp)+"</span><span>"+esc(result.name2)+": "+pct(result.bp)+
-    "</span><small>Vantagem: "+pct(Math.abs(result.margin))+" p.p.</small>":
-    "<small>"+(GOV_SET.has(uf)?"Ainda sem votos oficiais apurados.":"Sem 2º turno de governador nesta UF.")+"</small>");
+    "<span>"+esc(result.name1)+": "+pct(result.lp)+"</span><span>"+esc(result.name2)+": "+pct(result.bp)+"</span><small>Vantagem: "+pct(Math.abs(result.margin))+" p.p.</small>":
+    "<small>"+"Sem votos para governador nesta área."+"</small>")+
+    "<small><b>"+esc(sectionLabel(result))+"</b></small>";
   const rect=S("mapWrap").getBoundingClientRect();
   S("tooltip").style.left=Math.min(rect.width-205,Math.max(8,ev.clientX-rect.left+12))+"px";
   S("tooltip").style.top=Math.max(8,Math.min(rect.height-140,ev.clientY-rect.top+8))+"px";
@@ -358,7 +377,10 @@ function setSummary(d,title){
   S("bolsoVotes").textContent=d&&d.available?fmt(d.bolsonaro)+" votos":"— votos";
   S("lulaBar").style.width=d&&d.available?Math.min(d.lp,100)+"%":"0";
   S("bolsoBar").style.width=d&&d.available?Math.min(d.bp,100)+"%":"0";
-  S("counted").textContent=d?pct(d.progress):"—";
+  S("counted").textContent=d&&d.progressKnown?pct(d.progress):"—";
+  S("sectionsFraction").textContent=d&&d.sectionsTotal!==null&&d.sectionsDone!==null?
+    fmt(d.sectionsDone)+" / "+fmt(d.sectionsTotal)+" seções":"Contagem indisponível";
+  S("sectionProgressBar").style.width=d&&d.progressKnown?Math.max(0,Math.min(100,d.progress))+"%":"0%";
   S("difference").textContent=d&&d.available?pct(Math.abs(d.margin))+" p.p.":"—";
   S("leader").textContent=d&&d.available?(d.margin>0?d.name1:d.margin<0?d.name2:"Empate"):"Sem votos";
   S("sourceTime").textContent=d&&d.dg?"Atualização TSE: "+d.dg+" "+d.hg:"Aguardando atualização oficial";
@@ -460,7 +482,15 @@ async function refreshNational(){
   S("lastUpdate").textContent="Consulta: "+dateNow();
   S("nationalLula").textContent="6 UFs";
   S("nationalBolso").textContent=hasVotes+"/6";
-  S("nationalProgress").textContent=completed+"/6";
+  // Ponderar pelo número de seções nas seis UFs, nunca fazer média de percentuais.
+  const totals=GOV_STATES.map(uf=>state.ufData[uf]);
+  const complete=totals.every(d=>d&&d.sectionsTotal>0&&d.sectionsDone!==null);
+  const allTotal=totals.reduce((sum,d)=>sum+(d&&d.sectionsTotal||0),0);
+  const allDone=totals.reduce((sum,d)=>sum+(d&&d.sectionsDone||0),0);
+  S("nationalProgress").textContent=complete&&allTotal>0?pct(allDone/allTotal*100):"—";
+  S("govProgressDetails").textContent=complete?
+    fmt(allDone)+" de "+fmt(allTotal)+" seções · "+completed+" UFs 100%":
+    ok+"/6 UFs consultadas · percentual indisponível até receber todas";
   S("ufCounter").textContent=ok+"/6 arquivos";
   S("hintTurn").textContent="UFs com 100% das seções totalizadas.";
   if(error)notice(error+" estados não responderam. Mapa neutro onde não há dados confirmados.","warn");
