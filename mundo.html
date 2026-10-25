@@ -80,6 +80,7 @@ footer a{color:#84e0aa}
 @media(max-width:1100px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.countrylist{max-height:220px}}
 @media(max-width:660px){.wrapper{padding:12px}.brand{gap:9px}.logo{width:59px;height:57px}h1{font-size:26px}.kicker{font-size:8px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:12px}.stat strong{font-size:26px}.search-group{min-width:100%}.panelhead{padding:14px}.mapfoot{padding:11px 14px}#map{min-height:280px}.side{padding:14px}.tab{font-size:10px;padding:10px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important}}
+.sectionsTrack{height:6px;border-radius:30px;background:#274430;overflow:hidden;margin-top:8px}.sectionsFill{height:100%;width:0;background:linear-gradient(90deg,#209c63,#76e5a1);transition:width 1s ease}
 </style>
 </head>
 <body>
@@ -109,7 +110,7 @@ footer a{color:#84e0aa}
 <section class="stats">
   <div class="stat"><small>LULA · EXTERIOR</small><strong class="red" id="lulaWorld">—</strong><span>Votos válidos · TSE ZZ</span></div>
   <div class="stat"><small>FLÁVIO BOLSONARO · EXTERIOR</small><strong class="green" id="bolsoWorld">—</strong><span>Votos válidos · TSE ZZ</span></div>
-  <div class="stat"><small>APURAÇÃO NO EXTERIOR</small><strong id="overseasProgress">—</strong><span>Seções totalizadas</span></div>
+  <div class="stat"><small>APURAÇÃO NO EXTERIOR</small><strong id="overseasProgress">—</strong><span id="worldFraction">Aguardando seções do TSE</span></div>
   <div class="stat"><small>PAÍSES COM SEÇÕES</small><strong id="eligibleCountries">—</strong><span>Cadastro de seções confirmado</span></div>
   <div class="stat"><small>LOCALIDADES ELEITORAIS</small><strong id="eligibleCities">—</strong><span>Localidades com seções no TSE</span></div>
 </section>
@@ -139,7 +140,7 @@ footer a{color:#84e0aa}
     <div class="detailMeta" id="detailMeta">Clique em um país para acompanhar a apuração.</div>
     <div class="person"><div class="name"><span style="color:var(--red)">LULA</span><span id="lulaPct">—</span></div><div id="lulaVotes" class="votes">— votos</div><div class="track"><div id="lulaBar" class="fill red"></div></div></div>
     <div class="person"><div class="name"><span style="color:var(--green)">FLÁVIO BOLSONARO</span><span id="bolsoPct">—</span></div><div id="bolsoVotes" class="votes">— votos</div><div class="track"><div id="bolsoBar" class="fill green"></div></div></div>
-    <div class="metrics"><div><small>VOTOS VÁLIDOS</small><b id="totalValid">—</b></div><div><small>VANTAGEM</small><b id="difference">—</b></div><div style="grid-column:1/-1"><small>MAIOR VOTAÇÃO ENTRE OS DOIS</small><b id="leader">Sem votos</b></div></div>
+    <div class="metrics"><div><small>VOTOS VÁLIDOS</small><b id="totalValid">—</b></div><div><small>VANTAGEM</small><b id="difference">—</b></div><div style="grid-column:1/-1"><small>SEÇÕES TOTALIZADAS NESTA ABRANGÊNCIA</small><b id="detailProgress">—</b><small id="detailSectionCount" style="margin-top:7px;display:block">Aguardando dados oficiais</small><div class="sectionsTrack"><div id="detailProgressBar" class="sectionsFill"></div></div></div><div style="grid-column:1/-1"><small>MAIOR VOTAÇÃO ENTRE OS DOIS</small><b id="leader">Sem votos</b></div></div>
     <div class="divider"></div>
     <div class="h4">CIDADES COM LOCAL DE VOTAÇÃO</div>
     <div id="cityList" class="cityList"><p class="muted" style="padding:10px">Selecione um país.</p></div>
