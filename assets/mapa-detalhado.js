@@ -259,7 +259,7 @@ async function selectUF(uf,opt){
     drawCities(uf);
     progress(fmt(state.geoCities.get(uf).length)+" municípios desenhados. Consultando votos...");
     status("Municípios de "+uf+" carregados","ok");
-    await batchMunicipal(uf,false,job);
+    batchMunicipal(uf,false,job).catch(err=>{if(job===state.mapJob)progress('Falha na leitura de cidades: '+err.message)});
   }catch(err){
     if(job!==state.mapJob)return;
     status("Geografia municipal indisponível","warn");
