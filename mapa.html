@@ -3,385 +3,197 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#070c0a">
-<title>Mapa Eleitoral 2026 | Chapecó Mil Grau</title>
+<meta name="theme-color" content="#06100b">
+<meta name="description" content="Mapa de calor eleitoral por estado, município e zona eleitoral, com busca e zoom, baseado nos dados oficiais do TSE.">
+<title>Mapa de Calor Eleitoral | Chapecó Mil Grau</title>
 <style>
-:root{color-scheme:dark;--bg:#070b09;--panel:#0f1813;--panel2:#101e16;--line:#284332;--txt:#f4f8f4;--muted:#9aae9f;--red:#ef4553;--green:#17cb75;--gold:#efc56f}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--txt);background:radial-gradient(circle at 12% 14%,#103b28 0,transparent 33%),radial-gradient(circle at 88% 12%,#321920 0,transparent 27%),var(--bg);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.app{max-width:1640px;padding:24px;margin:auto}.top{display:flex;gap:20px;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:16px}.logo{width:91px;height:76px;border-radius:18px;background:#102017;border:1px solid var(--line);overflow:hidden;display:grid;place-items:center;font-weight:1000;font-size:17px;letter-spacing:-1px}.logo img{width:100%;height:100%;object-fit:contain}.logo span{display:none}.logo img:not([src]),.logo img.broken{display:none}.logo img.broken+span{display:block}
-.kicker{font-size:11px;font-weight:850;letter-spacing:.18em;color:#67db9f}.top h1{font-size:clamp(27px,3.25vw,46px);line-height:1.04;letter-spacing:-.045em;margin:6px 0}.sub{font-size:12px;color:var(--muted);line-height:1.5}
-.top-actions,.controls,.legend,.stat-row,.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.top-actions{justify-content:flex-end}.button{padding:10px 14px;border:1px solid #32563e;color:#f2f7f3;background:#132318;border-radius:11px;font-weight:800;font-size:12px;min-height:40px;transition:transform .2s ease,background .2s ease}.button:hover{background:#1e3a29;transform:translateY(-1px)}.button.active,.button.primary{background:#075b36;border-color:#21965a}.button:disabled{opacity:.5;cursor:wait}.badge{font-size:11px;font-weight:800;border:1px solid var(--line);padding:10px 13px;background:#132016;border-radius:100px;color:var(--gold)}.dot{width:8px;height:8px;display:inline-block;background:var(--gold);border-radius:50%;margin-right:5px;box-shadow:0 0 15px currentColor}
-.stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:13px}.stat{padding:17px 19px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#14231a,#0b1410);min-width:0}.stat .label{font-size:10px;letter-spacing:.10em;color:var(--muted);font-weight:800;text-transform:uppercase}.stat .value{font-size:clamp(22px,2.65vw,37px);letter-spacing:-.045em;font-weight:900;margin-top:8px}.stat .note{font-size:11px;color:var(--muted);margin-top:3px}.stat .value.red{color:var(--red)}.stat .value.green{color:var(--green)}
-.grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(310px,.82fr);gap:13px}.panel{border:1px solid var(--line);border-radius:21px;background:linear-gradient(145deg,#101b14,#0a110d);min-width:0;overflow:hidden}.panel-head{padding:20px 22px 13px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.eyebrow{font-size:10px;font-weight:900;color:#80d9a5;letter-spacing:.15em}.panel-head h2{font-size:19px;letter-spacing:-.025em;margin:5px 0 0}.map-meta{font-size:11px;color:var(--muted)}.map-container{position:relative;padding:0 15px;overflow:hidden;isolation:isolate}.map-container:after{content:"";pointer-events:none;position:absolute;inset:0;background:radial-gradient(ellipse at 48% 50%,transparent 24%,#08100a22 65%,#08100a88 100%);z-index:0}
-#map{width:100%;max-height:685px;min-height:410px;display:block;position:relative;z-index:1;filter:drop-shadow(0 15px 30px #0006)}
-.map-grid{fill:none;stroke:#31533d33;stroke-width:.8;stroke-dasharray:2 8}
-.state{cursor:pointer;stroke:#a3b8a9b3;stroke-width:1.25;vector-effect:non-scaling-stroke;transition:fill 1.6s ease,stroke .2s ease,stroke-width .2s ease,filter .2s ease;outline:none}
-.state:hover,.state:focus,.state.selected{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 7px #fff7)}
-.map-label{pointer-events:none;fill:#e9f3e9;paint-order:stroke;stroke:#07110f;stroke-width:3;stroke-linejoin:round;font-size:12px;font-weight:900;text-anchor:middle;opacity:.8}
-.tooltip{position:absolute;z-index:6;display:none;background:#0b1611fa;border:1px solid #518368;color:#fff;border-radius:13px;padding:12px 15px;pointer-events:none;width:205px;box-shadow:0 16px 38px #000b}.tooltip.show{display:block}.tooltip b{font-size:14px}.tooltip small{display:block;color:var(--muted);font-size:11px;margin-top:7px}.tooltip .twocol{display:flex;justify-content:space-between;margin-top:8px;gap:10px;font-size:12px}.tooltip strong.red{color:var(--red)}.tooltip strong.green{color:var(--green)}
-.legend{padding:12px 20px 18px;gap:14px;font-size:11px;color:#c8d4cb}.legend .sw{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}.legend .quiet{color:var(--muted)}.legend-note{padding:0 21px 16px;font-size:10px;color:#9baba0;line-height:1.5}
-.side{padding:17px 19px}.side h3{margin:4px 0 12px;font-size:18px}.detail-sub{font-size:12px;color:var(--muted);margin-bottom:19px;min-height:36px}.candidate{margin-bottom:17px}.candidate .names{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:850}.candidate .count{font-size:11px;color:var(--muted);margin:7px 0}.track{height:12px;background:#1f3025;border-radius:20px;overflow:hidden}.bar{height:100%;width:0;transition:width 1.4s ease;border-radius:20px}.bar.red{background:linear-gradient(90deg,#88232c,var(--red))}.bar.green{background:linear-gradient(90deg,#0c6036,var(--green))}
-.sep{height:1px;background:var(--line);margin:19px 0}.summary{display:grid;grid-template-columns:1fr 1fr;gap:12px}.summary div{padding:12px;background:#112017;border:1px solid var(--line);border-radius:12px}.summary small{font-size:10px;color:var(--muted)}.summary b{display:block;margin-top:6px;font-size:17px}
-.state-list-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:850;margin-bottom:10px}.state-list{max-height:290px;overflow-y:auto;display:grid;gap:5px;scrollbar-color:#395b43 transparent}.state-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:9px 10px;border:1px solid #23402e;background:#101c14;border-radius:9px;color:var(--txt);font-size:12px}.state-btn:hover,.state-btn.selected{background:#1b3524;border-color:#55956a}.state-btn .left{display:flex;gap:8px;align-items:center}.state-btn .sw{width:7px;height:21px;border-radius:4px}.state-btn .small{color:var(--muted);font-size:10px}
-.footer{margin:17px 0 6px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#9aaca0;font-size:11px;line-height:1.6}.footer a{color:#91e3ae}.notice{padding:12px 15px;border-radius:12px;margin-bottom:13px;background:#302610;border:1px solid #786436;color:#f2d99a;font-size:12px;line-height:1.5;display:none}.notice.show{display:block}.error{background:#39161b;border-color:#8a343b;color:#ffd0d3}
-body.obs .controls,body.obs .top-actions,body.obs .state-list-wrap,body.obs .footer{display:none}body.obs .app{max-width:1800px}body.obs .grid{grid-template-columns:minmax(0,2fr) minmax(280px,.65fr)}
-@media(max-width:1100px){.grid{grid-template-columns:1fr}.stat-row{grid-template-columns:repeat(2,minmax(0,1fr))}.state-list{max-height:170px}}
-@media(max-width:600px){.app{padding:13px}.top{gap:12px}.brand{align-items:flex-start;gap:10px}.logo{width:60px;height:54px;border-radius:11px}.top h1{font-size:27px;margin-top:3px}.kicker{font-size:8px}.sub{font-size:11px}.stat{padding:12px}.stat .value{font-size:24px}.stat .label{font-size:9px}.panel-head{padding:16px 14px 8px}.map-container{padding:0 1px}#map{min-height:290px}.legend{padding:5px 14px 14px;gap:9px}.side{padding:15px}.tooltip{width:174px;padding:10px}.controls{width:100%}.button{padding:9px 11px}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+:root{color-scheme:dark;--bg:#07110c;--panel:#0b1710;--border:#2b4a36;--text:#f2f6f3;--muted:#9daea2;--red:#f04a56;--green:#16d073}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(ellipse at 15% 10%,#0a3c23 0%,transparent 38%),radial-gradient(ellipse at 95% 45%,#261619 0%,transparent 40%),var(--bg)}
+button,input,select{font:inherit}button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #ccedcf;outline-offset:2px}
+.shell{margin:0 auto;max-width:1700px;padding:20px 24px 25px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:18px}
+.headerbrand{display:flex;align-items:center;gap:16px}
+.logo{width:87px;height:78px;border:1px solid var(--border);background:#0e1b12;border-radius:15px;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:950}
+.logo img{width:100%;height:100%;object-fit:contain}
+.logo .fallback{display:none}.logo img.broken{display:none}.logo img.broken+.fallback{display:block}
+.overline{letter-spacing:.14em;color:#6fdfa4;font-size:10px;font-weight:850}
+.header h1{font-size:clamp(25px,3vw,43px);font-weight:950;letter-spacing:-.05em;line-height:1.05;margin:5px 0 6px}
+.subtitle{font-size:12px;color:var(--muted);line-height:1.5}
+.status{border:1px solid var(--border);border-radius:40px;background:#10241a;padding:11px 15px;font-size:11px;font-weight:900}
+.status[data-tone="ok"]{color:#7ee9ac;border-color:#2a8a57}
+.status[data-tone="warn"]{color:#ffbd89;border-color:#8b5636}
+.toolbar{border:1px solid var(--border);border-radius:19px;background:#0c1b12e8;margin-bottom:12px;padding:14px 15px}
+.toolbar-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.button{border:1px solid #305941;background:#14291c;border-radius:11px;padding:10px 14px;min-height:41px;color:white;font-size:11px;font-weight:900;white-space:nowrap;transition:background .2s ease,transform .2s ease}
+.button:hover{background:#214631;transform:translateY(-1px)}
+.button.primary,.button.active{background:#08673e;border-color:#169762}
+.button.secondary{background:#111e16}
+.turnlabel{font-weight:850;font-size:11px;color:#b2dbbf;margin-left:auto}
+.searchgrid{display:grid;grid-template-columns:minmax(145px,1.05fr) minmax(170px,1.6fr) minmax(105px,.65fr) minmax(105px,.7fr) auto auto;gap:10px;align-items:end;margin-top:13px}
+.field{min-width:0}
+.field label{display:block;color:var(--muted);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.11em;margin:0 0 7px 2px}
+.field input,.field select{height:42px;background:#08160f;border:1px solid #365140;border-radius:10px;width:100%;outline:none;padding:10px 11px;color:#eff8f2;font-size:12px}
+.field input:focus,.field select:focus{border-color:#58c789}
+.field input::placeholder{color:#677c6b}
+.searchfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap}
+.micro{font-size:11px;color:var(--muted);line-height:1.4}
+.notice{display:none;margin:0 0 12px;border:1px solid #5b5430;background:#2c2514;border-radius:12px;padding:12px 15px;color:#e6daa8;font-size:12px;line-height:1.5}
+.notice.show{display:block}.notice.warn{color:#efccac}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:12px}
+.stat{background:linear-gradient(160deg,#112219,#0b160f);border:1px solid var(--border);border-radius:15px;padding:13px 17px}
+.stat small{font-size:10px;letter-spacing:.08em;color:var(--muted);font-weight:800}
+.stat strong{display:block;letter-spacing:-.03em;font-size:clamp(20px,2.4vw,32px);margin:7px 0 4px}
+.stat strong.red{color:var(--red)}.stat strong.green{color:var(--green)}
+.grid{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(300px,.65fr);gap:12px}
+.panel{min-width:0;border-radius:19px;border:1px solid var(--border);background:linear-gradient(150deg,#101e15,#09130d);overflow:hidden}
+.panelhead{padding:17px 21px 11px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.panelhead h2{margin:5px 0 0;font-size:17px;letter-spacing:-.025em}
+.maparea{position:relative;padding:0 6px 0 6px;background:radial-gradient(circle at 50% 48%,#18312244,transparent 50%)}
+.maparea svg{width:100%;height:auto;min-height:360px;max-height:650px;display:block}
+.geo{stroke:#a3b9aab2;stroke-width:1.1;vector-effect:non-scaling-stroke;outline:none;cursor:pointer;transition:fill 1.4s ease,stroke .25s ease,filter .25s ease}
+.geo.municipio{stroke:#acc3b499;stroke-width:.72}
+.geo:hover,.geo:focus,.geo.current{stroke:#fff;stroke-width:2.6;filter:drop-shadow(0 0 5px #c6f5d866)}
+#ufLayer.muted{opacity:.48}
+#cityLayer{opacity:0;pointer-events:none;transition:opacity .7s ease}
+#cityLayer.visible{opacity:1;pointer-events:auto}
+.tooltip{display:none;position:absolute;z-index:4;width:198px;border:1px solid #548869;background:#07130cf5;color:white;border-radius:12px;padding:12px 13px;box-shadow:0 15px 35px #000b;pointer-events:none;font-size:12px}
+.tooltip.show{display:block}.tooltip b{display:block;margin-bottom:6px;font-size:14px}.tooltip span{display:block;margin:4px 0}.tooltip small{display:block;margin-top:8px;color:#a4baa9}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:13px 20px 16px;align-items:center;color:#d6e4d9;font-size:11px}
+.key{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.redkey{background:var(--red)}.greenkey{background:var(--green)}.neutralkey{background:#253629;border:1px solid #7d9884}
+.caption{border-top:1px solid #233d2a;padding:13px 20px;color:#adc2b1;font-size:11px;line-height:1.5}
+.side{padding:18px 19px}
+.side h3{font-size:21px;margin:8px 0 7px;letter-spacing:-.04em}
+.side .subline{font-size:11px;color:var(--muted);margin-bottom:20px}
+.tag{display:inline-block;background:#133520;color:#80deac;border:1px solid #26553a;border-radius:6px;padding:4px 7px;font-size:10px;font-weight:850;margin:0 0 9px}
+.person{margin:16px 0}
+.person .topline{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13px;font-weight:850}
+.person .votes{color:#99b0a2;font-size:11px;margin:7px 0}
+.track{height:10px;background:#263a2b;border-radius:50px;overflow:hidden}
+.fill{width:0;height:100%;border-radius:50px;transition:width 1.3s ease}
+.fill.red{background:linear-gradient(90deg,#8b292f,var(--red))}.fill.green{background:linear-gradient(90deg,#136b3e,var(--green))}
+.split{height:1px;background:var(--border);margin:21px 0}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{border-radius:11px;background:#102319;border:1px solid var(--border);padding:11px;min-width:0}
+.metric small{color:#a1b0a3;display:block;font-size:10px}
+.metric b{display:block;margin-top:6px;font-size:15px;word-break:break-word}
+.section{padding:13px;background:#102118;border:1px dashed #416149;border-radius:12px;color:#bed0c2;font-size:11px;line-height:1.5;margin-top:15px}
+.legendhint{font-size:10px;color:#849f8b;line-height:1.5;margin-top:13px}
+.footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px;color:#98ad9c;font-size:11px;line-height:1.5}
+.footer a{color:#7ed5a3;text-decoration:underline}
+body.obs .toolbar,body.obs .footer{display:none}
+body.obs .shell{max-width:1800px}
+body.obs .grid{grid-template-columns:minmax(0,2fr) minmax(300px,.6fr)}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}.searchgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.searchgrid .button{align-self:end}.maparea svg{max-height:580px}}
+@media(max-width:680px){.shell{padding:12px}.headerbrand{gap:10px}.logo{width:57px;height:55px}.header h1{font-size:24px}.subtitle{font-size:11px}.searchgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:12px}.stat strong{font-size:23px}.maparea svg{min-height:260px}.panelhead{padding:14px}.legend{padding:12px 14px;gap:9px}.caption{padding:12px 14px}.side{padding:15px}.turnlabel{margin-left:0}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<div class="app">
-<header class="top">
-  <div class="brand">
-    <div class="logo"><img src="assets/cmg-logo-minimal.jpg" alt="Logo Chapecó Mil Grau" onerror="this.classList.add('broken')"><span>CMG</span></div>
+<div class="shell">
+<header class="header">
+  <div class="headerbrand">
+    <div class="logo"><img src="assets/cmg-logo-minimal.jpg" alt="Chapecó Mil Grau" onerror="this.classList.add('broken')"><span class="fallback">CMG</span></div>
     <div>
-      <div class="kicker">CHAPECÓ MIL GRAU • CENTRAL ELEIÇÕES 2026</div>
-      <h1>MAPA ELEITORAL DO BRASIL</h1>
-      <div class="sub">Mapa por Unidade da Federação • intensidade da cor pela vantagem em pontos percentuais • fonte: TSE</div>
+      <div class="overline">CHAPECÓ MIL GRAU · CENTRAL ELEIÇÕES 2026</div>
+      <h1>MAPA DE CALOR ELEITORAL</h1>
+      <div class="subtitle">Brasil → Estados → Municípios → Zonas eleitorais · Dados oficiais do TSE</div>
     </div>
   </div>
-  <div class="top-actions">
-    <span id="status" class="badge"><span class="dot"></span>Preparando mapa...</span>
-    <button id="obs" class="button" type="button" title="Ocultar controles para capturar no OBS">MODO OBS</button>
-  </div>
+  <div class="toolbar-row"><span id="status" class="status">Iniciando...</span><button id="obsBtn" class="button secondary" type="button">MODO OBS</button></div>
 </header>
-<div id="notice" class="notice" role="status" aria-live="polite"></div>
-<div class="top-actions controls" style="justify-content:flex-start;margin-bottom:14px">
-  <button id="round2" class="button active" type="button">2º TURNO · 25/10</button>
-  <button id="round1" class="button" type="button">1º TURNO · 04/10</button>
-  <button id="refresh" class="button primary" type="button">↻ ATUALIZAR TSE</button>
-  <button id="tour" class="button" type="button">▶ TOUR PELOS ESTADOS</button>
-  <button id="reset" class="button" type="button">VER BRASIL</button>
-  <span id="updated" class="map-meta" style="margin-left:auto">Aguardando consulta</span>
+
+<div class="toolbar">
+  <div class="toolbar-row">
+    <button id="turn2" class="button active" type="button">2º TURNO · 25/10</button>
+    <button id="turn1" class="button" type="button">1º TURNO · 04/10</button>
+    <button id="refreshBtn" class="button secondary" type="button">↻ ATUALIZAR TSE</button>
+    <div class="turnlabel" id="turnLabel">2º TURNO · 25/10/2026</div>
+  </div>
+  <div class="searchgrid">
+    <div class="field"><label for="ufSelect">Estado</label><select id="ufSelect"><option value="">Todo o Brasil</option></select></div>
+    <div class="field"><label for="cityInput">Buscar cidade</label><input id="cityInput" type="search" list="cityOptions" autocomplete="off" placeholder="Ex.: Chapecó"><datalist id="cityOptions"></datalist></div>
+    <div class="field"><label for="zoneInput">Zona eleitoral</label><input id="zoneInput" type="number" min="1" max="9999" inputmode="numeric" placeholder="Ex.: 35"></div>
+    <div class="field"><label for="sectionInput">Urna / seção</label><input id="sectionInput" type="number" min="1" max="9999" inputmode="numeric" placeholder="Ex.: 120"></div>
+    <button id="searchBtn" class="button primary" type="button">⌕ BUSCAR E APROXIMAR</button>
+    <button id="resetBtn" class="button secondary" type="button">VER BRASIL</button>
+  </div>
+  <div class="searchfoot">
+    <span id="searchHint" class="micro">Carregando cadastro dos municípios...</span>
+    <span class="micro">Para buscar urna, informe município + zona + número da seção.</span>
+  </div>
 </div>
-<section class="stat-row" aria-label="Resumo nacional">
-  <div class="stat"><div class="label">Lula • Brasil</div><div id="nationalLula" class="value red">—</div><div id="nationalLulaVotes" class="note">Aguardando TSE</div></div>
-  <div class="stat"><div class="label">Flávio Bolsonaro • Brasil</div><div id="nationalBolsonaro" class="value green">—</div><div id="nationalBolsonaroVotes" class="note">Aguardando TSE</div></div>
-  <div class="stat"><div class="label">Seções totalizadas • Brasil</div><div id="nationalProgress" class="value">—</div><div id="nationalProgressNote" class="note">Aguardando TSE</div></div>
-  <div class="stat"><div class="label">Estados com dados</div><div id="loaded" class="value">0/27</div><div id="loadedNote" class="note">UFs com votos presidenciais apurados</div></div>
+
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+<section class="stats" aria-label="Resumo da eleição">
+  <div class="stat"><small>LULA · BRASIL</small><strong id="nationalLula" class="red">—</strong><div class="micro">Presidência · votos válidos</div></div>
+  <div class="stat"><small>FLÁVIO BOLSONARO · BRASIL</small><strong id="nationalBolso" class="green">—</strong><div class="micro">Presidência · votos válidos</div></div>
+  <div class="stat"><small>APURAÇÃO NACIONAL</small><strong id="nationalProgress">—</strong><div class="micro" id="hintTurn">Fonte: TSE</div></div>
+  <div class="stat"><small>ARQUIVOS OFICIAIS</small><strong id="ufCounter">0/28</strong><div class="micro" id="lastUpdate">Ainda não consultado</div></div>
 </section>
+
 <main class="grid">
-  <section class="panel" aria-label="Mapa do Brasil">
-    <div class="panel-head">
-      <div><div class="eyebrow">BRASIL • 26 ESTADOS + DISTRITO FEDERAL</div><h2 id="mapTitle">LULA × FLÁVIO BOLSONARO</h2></div>
-      <div id="mapMeta" class="map-meta">Carregando contornos geográficos...</div>
+  <section class="panel">
+    <div class="panelhead">
+      <div><div class="overline" id="breadcrumb">BRASIL / VISÃO NACIONAL</div><h2 id="mapCaption">Mapa nacional por estado</h2></div>
+      <div class="micro">Clique para aproximar · arraste? use os filtros</div>
     </div>
-    <div class="map-container" id="mapbox">
-      <svg id="map" role="img" aria-label="Mapa interativo do Brasil por estado, colorido pela vantagem eleitoral" viewBox="0 0 860 760" preserveAspectRatio="xMidYMid meet">
-        <g id="mapGrid"></g><g id="stateShapes"></g><g id="stateLabels"></g>
+    <div class="maparea" id="mapWrap">
+      <svg id="map" viewBox="0 0 860 760" role="img" aria-label="Mapa interativo do Brasil e dos municípios">
+        <g id="ufLayer"></g>
+        <g id="cityLayer"></g>
       </svg>
-      <div id="tooltip" class="tooltip" aria-hidden="true"></div>
+      <div id="tooltip" class="tooltip" role="tooltip"></div>
     </div>
     <div class="legend">
-      <span><i class="sw" style="background:#ef4553"></i> Lula à frente</span>
-      <span><i class="sw" style="background:#17cb75"></i> Flávio Bolsonaro à frente</span>
-      <span><i class="sw" style="background:#233529;border:1px solid #56725f"></i> Sem dados / empate</span>
-      <span class="quiet">Maior vantagem = cor mais intensa</span>
+      <span><i class="key redkey"></i>Lula à frente</span>
+      <span><i class="key greenkey"></i>Flávio Bolsonaro à frente</span>
+      <span><i class="key neutralkey"></i>Empate / sem votos</span>
+      <span style="color:var(--muted)">Cor mais intensa = maior vantagem percentual</span>
     </div>
-    <div class="legend-note">A tonalidade representa a diferença entre os percentuais dos dois candidatos, não a densidade populacional ou quantidade de eleitores. Cada UF tem uma única cor nesta V1. Dados do TSE por UF podem ter horários de geração diferentes.</div>
+    <div class="caption">
+      <b id="loadProgress">Carregando malha do mapa...</b>
+      <div style="margin-top:5px">Cada município recebe uma única cor baseada na diferença percentual do resultado presidencial. O contorno corresponde ao limite municipal, não à localização dos eleitores. Resultados indisponíveis permanecem neutros.</div>
+    </div>
   </section>
   <aside class="panel side">
-    <div class="eyebrow" id="selectedUf">VISÃO NACIONAL</div>
-    <h3 id="selectedName">Brasil</h3>
-    <div id="detailSub" class="detail-sub">Clique em um estado no mapa para visualizar os votos e a vantagem local.</div>
-    <div class="candidate">
-      <div class="names"><span style="color:var(--red)">LULA</span><span id="lulaPercent">—</span></div>
-      <div class="count" id="lulaVotes">— votos</div><div class="track"><div id="lulaBar" class="bar red"></div></div>
+    <div id="currentData" class="tag">AGUARDANDO TSE</div>
+    <div class="overline">DETALHAMENTO DA APURAÇÃO</div>
+    <h3 id="detailTitle">Brasil</h3>
+    <div class="subline" id="sourceTime">Selecione uma abrangência para ver os votos</div>
+    <div class="person">
+      <div class="topline"><span style="color:var(--red)">LULA</span><span id="lulaPct">—</span></div>
+      <div class="votes" id="lulaVotes">— votos</div>
+      <div class="track"><div class="fill red" id="lulaBar"></div></div>
     </div>
-    <div class="candidate">
-      <div class="names"><span style="color:var(--green)">FLÁVIO BOLSONARO</span><span id="bolsonaroPercent">—</span></div>
-      <div class="count" id="bolsonaroVotes">— votos</div><div class="track"><div id="bolsonaroBar" class="bar green"></div></div>
+    <div class="person">
+      <div class="topline"><span style="color:var(--green)">FLÁVIO BOLSONARO</span><span id="bolsoPct">—</span></div>
+      <div class="votes" id="bolsoVotes">— votos</div>
+      <div class="track"><div class="fill green" id="bolsoBar"></div></div>
     </div>
-    <div class="summary"><div><small>VANTAGEM</small><b id="margin">—</b></div><div><small>SEÇÕES TOTALIZADAS</small><b id="progress">—</b></div></div>
-    <div class="sep"></div>
-    <div class="state-list-wrap">
-      <div class="state-list-head"><span>ESTADOS E DISTRITO FEDERAL</span><span id="ufCount" class="map-meta">27 UFs</span></div>
-      <div id="stateList" class="state-list" aria-label="Selecionar estado"></div>
+    <div class="split"></div>
+    <div class="metrics">
+      <div class="metric"><small>VANTAGEM</small><b id="difference">—</b></div>
+      <div class="metric"><small>SEÇÕES APURADAS</small><b id="counted">—</b></div>
+      <div class="metric" style="grid-column:1/-1"><small>CANDIDATO À FRENTE</small><b id="leader">Sem votos</b></div>
     </div>
+    <div class="section">
+      <div style="font-weight:900;margin-bottom:6px;color:#89d6ac">PESQUISA POR URNA / SEÇÃO</div>
+      <div id="sectionDetails">Para localizar uma seção, informe a cidade, a zona eleitoral e o número da seção. É possível confirmar a seção no cadastro oficial EA16; os votos da urna exigem leitura do Boletim de Urna, que não é representado por um ponto geográfico neste mapa.</div>
+    </div>
+    <div class="legendhint">A cor é uma comparação proporcional entre candidatos, não uma previsão eleitoral. A versão municipal depende dos arquivos JSON e da malha cartográfica do IBGE.</div>
   </aside>
 </main>
+
 <footer class="footer">
-  <span>FONTE DOS VOTOS: <a href="https://resultados.tse.jus.br/" target="_blank" rel="noopener">Tribunal Superior Eleitoral</a> • MALHA DAS UFs: IBGE via br-geojson (CC0).</span>
-  <span>CMG ELEIÇÕES 2026 • <a href="./index.html">Voltar ao painel original</a> • Atualização a cada <b id="refreshTime">60</b>s.</span>
+  <span>Fonte dos votos: <a href="https://resultados.tse.jus.br/" target="_blank" rel="noopener">TSE</a> · Limites municipais: IBGE via <a href="https://github.com/henriquemalvar/br-geojson" target="_blank" rel="noopener">br-geojson</a> · <a href="./index.html">Painel original CMG</a></span>
+  <span><a href="./mapa-v1.html">Versão anterior V1</a> · Atualização de estados a cada 2 minutos; cidades sob demanda.</span>
 </footer>
 </div>
-<script>
-"use strict";
-const UF_NAMES={AC:"Acre",AL:"Alagoas",AP:"Amapá",AM:"Amazonas",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",GO:"Goiás",MA:"Maranhão",MT:"Mato Grosso",MS:"Mato Grosso do Sul",MG:"Minas Gerais",PA:"Pará",PB:"Paraíba",PR:"Paraná",PE:"Pernambuco",PI:"Piauí",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RS:"Rio Grande do Sul",RO:"Rondônia",RR:"Roraima",SC:"Santa Catarina",SP:"São Paulo",SE:"Sergipe",TO:"Tocantins"};
-const UFS=Object.keys(UF_NAMES);
-const CANDIDATES={lula:"13",bolsonaro:"22"};
-const ELECTION={1:"6257",2:"6258"};
-const REFRESH_MS=60000;
-const $=id=>document.getElementById(id);
-const model={round:2,states:{},national:null,selected:null,features:[],tour:false,tourTimer:null,refreshTimer:null,busy:false,requestId:0,loaded:0,lastCheck:null};
-let coords=null;
-function number(v){if(typeof v==="number")return v;return Number(String(v??"0").replace(/\./g,"").replace(",",".").replace(/[^\d.-]/g,""))||0}
-function fmt(v){return Math.round(v||0).toLocaleString("pt-BR")}
-function pct(v){return (Number(v)||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%"}
-function esc(t){return String(t??"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]))}
-function setStatus(message){$("status").innerHTML='<span class="dot"></span>'+esc(message)}
-function notice(msg,isError){const x=$("notice");x.textContent=msg;x.className="notice show"+(isError?" error":"")}
-function clearNotice(){$("notice").className="notice"}
-function officialUrl(uf,round){
-  const code=ELECTION[round],local=uf.toLowerCase();
-  return "https://resultados.tse.jus.br/oficial/ele2026/"+code+"/dados/"+local+"/"+local+"-c0001-e"+code.padStart(6,"0")+"-u.json";
-}
-async function fetchJson(url){
-  const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),14000);
-  try{
-    const res=await fetch(url+(url.includes("?")?"&":"?")+"ts="+Date.now(),{cache:"no-store",signal:controller.signal});
-    if(!res.ok)throw Error("HTTP "+res.status);
-    return await res.json();
-  }finally{clearTimeout(timeout)}
-}
-function extractCandidates(doc){
-  const results=[];
-  const cargos=Array.isArray(doc.carg)?doc.carg:[];
-  for(const cargo of cargos){
-    if(String(cargo.cd)!=="1"&&String(cargo.cd)!=="0001")continue;
-    for(const group of (cargo.agr||[])){
-      for(const party of (group.par||[])){
-        for(const c of (party.cand||[]))results.push(c);
-      }
-    }
-  }
-  return results;
-}
-function parseResult(doc,uf){
-  if(!doc||typeof doc!=="object"||!Array.isArray(doc.carg))throw Error("Estrutura do TSE incompatível");
-  const candidates=extractCandidates(doc);
-  const lula=candidates.find(c=>String(c.n)===CANDIDATES.lula);
-  const bolsonaro=candidates.find(c=>String(c.n)===CANDIDATES.bolsonaro);
-  if(!lula||!bolsonaro)throw Error("Candidatos 13 e 22 não encontrados no arquivo");
-  const lv=number(lula.vap),bv=number(bolsonaro.vap),valid=number(doc.v&&doc.v.vv);
-  const sum=lv+bv;
-  const progress=number(doc.s&&doc.s.pst);
-  const available=valid>0&&sum>0;
-  const lp=available?lv/(valid||sum)*100:0;
-  const bp=available?bv/(valid||sum)*100:0;
-  return {uf,name:UF_NAMES[uf]||"Brasil",lula:lv,bolsonaro:bv,valid,lp,bp,margin:lp-bp,progress,available,dg:doc.dg||"",hg:doc.hg||"",idg:doc.idg||""};
-}
-function color(d){
-  if(!d||!d.available||Math.abs(d.margin)<0.005)return "rgba(116,151,125,0.13)";
-  const strength=Math.min(Math.abs(d.margin)/24,1);
-  const opacity=(0.20+0.76*Math.pow(strength,.70)).toFixed(3);
-  return d.margin>0?"rgba(239,69,83,"+opacity+")":"rgba(23,203,117,"+opacity+")";
-}
-function pointsFromGeom(geo){
-  const out=[];
-  function addPolygon(rings){for(const ring of rings)for(const p of ring)if(Array.isArray(p)&&p.length>=2)out.push(p)}
-  if(geo.type==="Polygon")addPolygon(geo.coordinates);
-  else if(geo.type==="MultiPolygon")geo.coordinates.forEach(addPolygon);
-  return out;
-}
-function buildProjection(features){
-  const pts=features.flatMap(f=>pointsFromGeom(f.geometry));
-  const minX=Math.min(...pts.map(p=>p[0])),maxX=Math.max(...pts.map(p=>p[0]));
-  const minY=Math.min(...pts.map(p=>p[1])),maxY=Math.max(...pts.map(p=>p[1]));
-  const scale=Math.min(775/(maxX-minX),670/(maxY-minY));
-  const offsetX=(860-(maxX-minX)*scale)/2;
-  const offsetY=(760-(maxY-minY)*scale)/2;
-  return p=>[(offsetX+(p[0]-minX)*scale).toFixed(1),(offsetY+(maxY-p[1])*scale).toFixed(1)];
-}
-function pathOf(geo,project){
-  function ringPath(ring){return ring.map((p,i)=>{const xy=project(p);return(i===0?"M":"L")+xy[0]+" "+xy[1]}).join(" ")+" Z"}
-  function polygonPath(rings){return rings.map(ringPath).join(" ")}
-  return geo.type==="Polygon"?polygonPath(geo.coordinates):geo.coordinates.map(polygonPath).join(" ");
-}
-function centroid(feature,project){
-  const pts=pointsFromGeom(feature.geometry);
-  if(!pts.length)return [0,0];
-  let x=0,y=0;for(const p of pts){x+=p[0];y+=p[1]}
-  return project([x/pts.length,y/pts.length]).map(Number);
-}
-async function loadMap(){
-  const geo=await fetchJson("assets/brasil-estados.geojson");
-  if(!Array.isArray(geo.features)||geo.features.length!==27)throw Error("Mapa de UFs incompleto");
-  model.features=geo.features;
-  const project=buildProjection(geo.features);
-  const ns="http://www.w3.org/2000/svg";
-  const shapes=$("stateShapes"),labels=$("stateLabels");
-  shapes.replaceChildren();labels.replaceChildren();
-  for(const f of geo.features){
-    const uf=String(f.properties.sigla||"").toUpperCase();
-    const p=document.createElementNS(ns,"path");
-    p.setAttribute("d",pathOf(f.geometry,project));p.setAttribute("fill-rule","evenodd");
-    p.setAttribute("class","state");p.setAttribute("id","uf-"+uf);p.setAttribute("tabindex","0");
-    p.setAttribute("role","button");p.setAttribute("aria-label","Selecionar "+(UF_NAMES[uf]||uf));
-    p.setAttribute("fill","rgba(116,151,125,0.13)");
-    p.dataset.uf=uf;
-    p.addEventListener("click",()=>choose(uf));
-    p.addEventListener("pointermove",e=>showTooltip(uf,e));
-    p.addEventListener("pointerleave",hideTooltip);
-    p.addEventListener("focus",()=>showTooltip(uf,null));
-    p.addEventListener("blur",hideTooltip);
-    p.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();choose(uf)}});
-    shapes.appendChild(p);
-    if(uf!=="DF"&&uf!=="SE"&&uf!=="AL"&&uf!=="PB"&&uf!=="RN"&&uf!=="ES"){
-      const xy=centroid(f,project),t=document.createElementNS(ns,"text");
-      t.setAttribute("x",xy[0]);t.setAttribute("y",xy[1]);t.setAttribute("class","map-label");t.textContent=uf;labels.appendChild(t);
-    }
-  }
-  $("mapMeta").textContent="Passe o mouse ou clique em uma UF";
-  repaint();
-}
-function tooltipMarkup(uf){
-  const d=model.states[uf];const first='<b>'+esc(UF_NAMES[uf])+' · '+uf+'</b>';
-  if(!d||!d.available)return first+'<small>Sem votos apurados disponíveis</small>';
-  return first+'<div class="twocol"><span>Lula</span><strong class="red">'+pct(d.lp)+'</strong></div>'+
-    '<div class="twocol"><span>Flávio Bolsonaro</span><strong class="green">'+pct(d.bp)+'</strong></div>'+
-    '<small>Vantagem: '+pct(Math.abs(d.margin))+' p.p. · Apuração: '+pct(d.progress)+'</small>';
-}
-function showTooltip(uf,event){
-  const t=$("tooltip"),box=$("mapbox");
-  t.innerHTML=tooltipMarkup(uf);t.classList.add("show");t.setAttribute("aria-hidden","false");
-  if(event){
-    const r=box.getBoundingClientRect();
-    const px=event.clientX-r.left,py=event.clientY-r.top;
-    t.style.left=Math.max(5,Math.min(px+15,r.width-220))+"px";
-    t.style.top=Math.max(5,Math.min(py+12,r.height-155))+"px";
-  }else{t.style.left="12px";t.style.top="12px"}
-}
-function hideTooltip(){const t=$("tooltip");t.classList.remove("show");t.setAttribute("aria-hidden","true")}
-function repaint(){
-  for(const uf of UFS){
-    const path=$("uf-"+uf);if(path){
-      path.setAttribute("fill",color(model.states[uf]));
-      path.classList.toggle("selected",model.selected===uf);
-    }
-  }
-  renderList();renderDetail();renderNational();
-}
-function choose(uf){
-  model.selected=uf||null;
-  if(!uf)hideTooltip();
-  repaint();
-}
-function winner(d){
-  if(!d||!d.available)return "Sem dados";
-  if(Math.abs(d.margin)<.005)return "Empate";
-  return d.margin>0?"Lula":"Flávio Bolsonaro";
-}
-function renderList(){
-  const rows=UFS.map(uf=>({uf,d:model.states[uf],name:UF_NAMES[uf]}));
-  rows.sort((a,b)=>(Number(!!(b.d&&b.d.available))-Number(!!(a.d&&a.d.available)))||a.name.localeCompare(b.name,"pt-BR"));
-  $("stateList").innerHTML=rows.map(item=>{
-    const d=item.d,enabled=d&&d.available;
-    const side=enabled?(d.margin>0?"Lula":d.margin<0?"Bolsonaro":"Empate"):"Sem dados";
-    const ink=color(d);
-    return '<button type="button" class="state-btn'+(model.selected===item.uf?" selected":"")+'" data-uf="'+item.uf+'">'+
-      '<span class="left"><i class="sw" style="background:'+ink+'"></i><b>'+item.uf+'</b> '+esc(item.name)+'</span>'+
-      '<span class="small">'+side+(enabled?" · "+pct(Math.abs(d.margin))+" p.p.":"")+'</span></button>';
-  }).join("");
-  $("stateList").querySelectorAll("button").forEach(x=>x.addEventListener("click",()=>choose(x.dataset.uf)));
-}
-function renderNational(){
-  const d=model.national;
-  $("nationalLula").textContent=d&&d.available?pct(d.lp):"—";
-  $("nationalLulaVotes").textContent=d&&d.available?fmt(d.lula)+" votos":"Sem votos disponíveis no TSE";
-  $("nationalBolsonaro").textContent=d&&d.available?pct(d.bp):"—";
-  $("nationalBolsonaroVotes").textContent=d&&d.available?fmt(d.bolsonaro)+" votos":"Sem votos disponíveis no TSE";
-  $("nationalProgress").textContent=d?pct(d.progress):"—";
-  $("nationalProgressNote").textContent=d?"Boletim nacional • inclui exterior":"Aguardando arquivo nacional";
-  const available=UFS.filter(uf=>model.states[uf]&&model.states[uf].available).length;
-  $("loaded").textContent=available+"/27";
-  $("loadedNote").textContent=model.loaded+"/27 arquivos estaduais consultados";
-}
-function renderDetail(){
-  const d=model.selected?model.states[model.selected]:model.national,uf=model.selected;
-  $("selectedUf").textContent=uf?"UF · "+uf:"VISÃO NACIONAL";
-  $("selectedName").textContent=uf?UF_NAMES[uf]:"Brasil";
-  $("detailSub").textContent=(!d||!d.available)?
-    "Ainda não há votos apurados disponíveis nesta abrangência. A área permanece neutra.":
-    "Fonte: TSE · Gerado em "+(d.dg||"data não informada")+" às "+(d.hg||"horário não informado")+".";
-  $("lulaPercent").textContent=d&&d.available?pct(d.lp):"—";
-  $("bolsonaroPercent").textContent=d&&d.available?pct(d.bp):"—";
-  $("lulaVotes").textContent=d&&d.available?fmt(d.lula)+" votos":"— votos";
-  $("bolsonaroVotes").textContent=d&&d.available?fmt(d.bolsonaro)+" votos":"— votos";
-  $("lulaBar").style.width=(d&&d.available?Math.min(100,d.lp):0)+"%";
-  $("bolsonaroBar").style.width=(d&&d.available?Math.min(100,d.bp):0)+"%";
-  $("margin").textContent=d&&d.available?winner(d)+" · "+pct(Math.abs(d.margin))+" p.p.":"—";
-  $("progress").textContent=d?pct(d.progress):"—";
-  $("mapTitle").textContent="LULA × FLÁVIO BOLSONARO · "+(model.round===2?"2º TURNO":"1º TURNO");
-}
-async function refresh(){
-  if(model.busy)return;
-  model.busy=true;const request=++model.requestId,round=model.round;
-  $("refresh").disabled=true;model.loaded=0;
-  setStatus("Consultando TSE · 0/28");
-  const newStates={};let errors=[],success=0;
-  async function fetchOne(uf){
-    try{
-      const j=await fetchJson(officialUrl(uf,round));
-      if(request!==model.requestId)return;
-      const parsed=parseResult(j,uf);
-      if(uf==="BR")model.national=parsed;else newStates[uf]=parsed;
-      success++;
-    }catch(err){errors.push(uf+": "+(err&&err.message||"falha"))}
-    if(uf!=="BR"){model.loaded++;$("loadedNote").textContent=model.loaded+"/27 arquivos estaduais consultados"}
-    if(request===model.requestId)setStatus("Consultando TSE · "+(success+errors.length)+"/28");
-  }
-  // Concurrency limit avoids sending 28 simultaneous requests to the TSE.
-  const queue=["BR",...UFS];let pos=0;
-  async function worker(){while(pos<queue.length){const uf=queue[pos++];await fetchOne(uf)}}
-  await Promise.all(Array.from({length:5},worker));
-  if(request!==model.requestId)return;
-  model.states=newStates;model.lastCheck=new Date();model.busy=false;
-  $("refresh").disabled=false;
-  $("updated").textContent="Consulta: "+model.lastCheck.toLocaleTimeString("pt-BR");
-  const available=UFS.filter(uf=>newStates[uf]&&newStates[uf].available).length;
-  const any=model.national&&model.national.available;
-  if(errors.length){
-    notice("Atenção: "+errors.length+" arquivos não puderam ser lidos. Alguns estados podem ficar neutros. Verifique a conexão, o CORS do TSE e tente atualizar.",true);
-    setStatus("TSE · "+(28-errors.length)+"/28 arquivos");
-  }else if(!any&&available===0){
-    notice("Dados oficiais do "+(round===2?"2º":"1º")+" turno carregados, mas ainda sem votos apurados. O mapa continuará neutro até o TSE registrar votos.",false);
-    setStatus("TSE · sem votos apurados");
-  }else{
-    clearNotice();setStatus("TSE · "+available+" UFs com dados");
-  }
-  repaint();
-}
-function setRound(round){
-  if(model.busy)return;
-  model.round=round;model.national=null;model.states={};
-  $("round1").classList.toggle("active",round===1);$("round2").classList.toggle("active",round===2);
-  $("mapMeta").textContent=round===2?"Apuração presidencial de 25/10/2026":"Apuração presidencial de 04/10/2026";
-  repaint();refresh();
-}
-function stopTour(){
-  model.tour=false;if(model.tourTimer)clearInterval(model.tourTimer);
-  model.tourTimer=null;$("tour").textContent="▶ TOUR PELOS ESTADOS";$("tour").classList.remove("active");
-}
-function toggleTour(){
-  if(model.tour){stopTour();return}
-  model.tour=true;$("tour").textContent="■ PARAR TOUR";$("tour").classList.add("active");
-  let idx=0;const cycle=()=>{choose(UFS[idx++%UFS.length])};
-  cycle();model.tourTimer=setInterval(cycle,4500);
-}
-function bootHandlers(){
-  $("round1").addEventListener("click",()=>setRound(1));
-  $("round2").addEventListener("click",()=>setRound(2));
-  $("refresh").addEventListener("click",refresh);
-  $("reset").addEventListener("click",()=>{stopTour();choose(null)});
-  $("tour").addEventListener("click",toggleTour);
-  $("obs").addEventListener("click",()=>{
-    const on=document.body.classList.toggle("obs");$("obs").textContent=on?"SAIR DO MODO OBS":"MODO OBS";
-  });
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(document.body.classList.contains("obs")){document.body.classList.remove("obs");$("obs").textContent="MODO OBS"}stopTour();choose(null)}});
-  model.refreshTimer=setInterval(refresh,REFRESH_MS);
-}
-(async()=>{
-  bootHandlers();
-  try{await loadMap()}catch(err){
-    notice("Não foi possível carregar a malha do Brasil: "+(err&&err.message||"erro")+". Atualize a página para tentar novamente.",true);
-    $("mapMeta").textContent="Mapa geográfico indisponível";
-  }
-  await refresh();
-})();
-</script>
+<script src="assets/mapa-detalhado.js" defer></script>
 </body>
 </html>
