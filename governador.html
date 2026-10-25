@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#06100b">
+<meta name="description" content="Mapa dos seis estados com segundo turno para governador 2026, com zoom municipal, consulta por zona eleitoral e dados oficiais do TSE.">
+<title>2º Turno Governador 2026 | Chapecó Mil Grau</title>
+<style>
+:root{color-scheme:dark;--bg:#07110c;--panel:#0b1710;--border:#2b4a36;--text:#f2f6f3;--muted:#9daea2;--red:#f04a56;--green:#16d073}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(ellipse at 15% 10%,#0a3c23 0%,transparent 38%),radial-gradient(ellipse at 95% 45%,#261619 0%,transparent 40%),var(--bg)}
+button,input,select{font:inherit}button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #ccedcf;outline-offset:2px}
+.shell{margin:0 auto;max-width:1700px;padding:20px 24px 25px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:18px}
+.headerbrand{display:flex;align-items:center;gap:16px}
+.logo{width:87px;height:78px;border:1px solid var(--border);background:#0e1b12;border-radius:15px;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:950}
+.logo img{width:100%;height:100%;object-fit:contain}
+.logo .fallback{display:none}.logo img.broken{display:none}.logo img.broken+.fallback{display:block}
+.overline{letter-spacing:.14em;color:#6fdfa4;font-size:10px;font-weight:850}
+.header h1{font-size:clamp(25px,3vw,43px);font-weight:950;letter-spacing:-.05em;line-height:1.05;margin:5px 0 6px}
+.subtitle{font-size:12px;color:var(--muted);line-height:1.5}
+.status{border:1px solid var(--border);border-radius:40px;background:#10241a;padding:11px 15px;font-size:11px;font-weight:900}
+.status[data-tone="ok"]{color:#7ee9ac;border-color:#2a8a57}
+.status[data-tone="warn"]{color:#ffbd89;border-color:#8b5636}
+.toolbar{border:1px solid var(--border);border-radius:19px;background:#0c1b12e8;margin-bottom:12px;padding:14px 15px}
+.toolbar-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.button{border:1px solid #305941;background:#14291c;border-radius:11px;padding:10px 14px;min-height:41px;color:white;font-size:11px;font-weight:900;white-space:nowrap;transition:background .2s ease,transform .2s ease}
+.button:hover{background:#214631;transform:translateY(-1px)}
+.button.primary,.button.active{background:#08673e;border-color:#169762}
+.button.secondary{background:#111e16}
+.turnlabel{font-weight:850;font-size:11px;color:#b2dbbf;margin-left:auto}
+.searchgrid{display:grid;grid-template-columns:minmax(145px,1.05fr) minmax(170px,1.6fr) minmax(105px,.65fr) minmax(105px,.7fr) auto auto;gap:10px;align-items:end;margin-top:13px}
+.field{min-width:0}
+.field label{display:block;color:var(--muted);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.11em;margin:0 0 7px 2px}
+.field input,.field select{height:42px;background:#08160f;border:1px solid #365140;border-radius:10px;width:100%;outline:none;padding:10px 11px;color:#eff8f2;font-size:12px}
+.field input:focus,.field select:focus{border-color:#58c789}
+.field input::placeholder{color:#677c6b}
+.searchfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap}
+.micro{font-size:11px;color:var(--muted);line-height:1.4}
+.notice{display:none;margin:0 0 12px;border:1px solid #5b5430;background:#2c2514;border-radius:12px;padding:12px 15px;color:#e6daa8;font-size:12px;line-height:1.5}
+.notice.show{display:block}.notice.warn{color:#efccac}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:12px}
+.stat{background:linear-gradient(160deg,#112219,#0b160f);border:1px solid var(--border);border-radius:15px;padding:13px 17px}
+.stat small{font-size:10px;letter-spacing:.08em;color:var(--muted);font-weight:800}
+.stat strong{display:block;letter-spacing:-.03em;font-size:clamp(20px,2.4vw,32px);margin:7px 0 4px}
+.stat strong.red{color:var(--red)}.stat strong.green{color:var(--green)}
+.grid{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(300px,.65fr);gap:12px}
+.panel{min-width:0;border-radius:19px;border:1px solid var(--border);background:linear-gradient(150deg,#101e15,#09130d);overflow:hidden}
+.panelhead{padding:17px 21px 11px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.panelhead h2{margin:5px 0 0;font-size:17px;letter-spacing:-.025em}
+.maparea{position:relative;padding:0 6px 0 6px;background:radial-gradient(circle at 50% 48%,#18312244,transparent 50%)}
+.maparea svg{width:100%;height:auto;min-height:360px;max-height:650px;display:block}
+.geo{stroke:#a3b9aab2;stroke-width:1.1;vector-effect:non-scaling-stroke;outline:none;cursor:pointer;transition:fill 1.4s ease,stroke .25s ease,filter .25s ease}
+.geo.municipio{stroke:#acc3b499;stroke-width:.72}
+.geo:hover,.geo:focus,.geo.current{stroke:#fff;stroke-width:2.6;filter:drop-shadow(0 0 5px #c6f5d866)}
+#ufLayer.muted{opacity:.48}
+#cityLayer{opacity:0;pointer-events:none;transition:opacity .7s ease}
+#cityLayer.visible{opacity:1;pointer-events:auto}
+.tooltip{display:none;position:absolute;z-index:4;width:198px;border:1px solid #548869;background:#07130cf5;color:white;border-radius:12px;padding:12px 13px;box-shadow:0 15px 35px #000b;pointer-events:none;font-size:12px}
+.tooltip.show{display:block}.tooltip b{display:block;margin-bottom:6px;font-size:14px}.tooltip span{display:block;margin:4px 0}.tooltip small{display:block;margin-top:8px;color:#a4baa9}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:13px 20px 16px;align-items:center;color:#d6e4d9;font-size:11px}
+.key{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.redkey{background:var(--red)}.greenkey{background:var(--green)}.neutralkey{background:#253629;border:1px solid #7d9884}
+.caption{border-top:1px solid #233d2a;padding:13px 20px;color:#adc2b1;font-size:11px;line-height:1.5}
+.side{padding:18px 19px}
+.side h3{font-size:21px;margin:8px 0 7px;letter-spacing:-.04em}
+.side .subline{font-size:11px;color:var(--muted);margin-bottom:20px}
+.tag{display:inline-block;background:#133520;color:#80deac;border:1px solid #26553a;border-radius:6px;padding:4px 7px;font-size:10px;font-weight:850;margin:0 0 9px}
+.person{margin:16px 0}
+.person .topline{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13px;font-weight:850}
+.person .votes{color:#99b0a2;font-size:11px;margin:7px 0}
+.track{height:10px;background:#263a2b;border-radius:50px;overflow:hidden}
+.fill{width:0;height:100%;border-radius:50px;transition:width 1.3s ease}
+.fill.red{background:linear-gradient(90deg,#8b292f,var(--red))}.fill.green{background:linear-gradient(90deg,#136b3e,var(--green))}
+.split{height:1px;background:var(--border);margin:21px 0}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{border-radius:11px;background:#102319;border:1px solid var(--border);padding:11px;min-width:0}
+.metric small{color:#a1b0a3;display:block;font-size:10px}
+.metric b{display:block;margin-top:6px;font-size:15px;word-break:break-word}
+.section{padding:13px;background:#102118;border:1px dashed #416149;border-radius:12px;color:#bed0c2;font-size:11px;line-height:1.5;margin-top:15px}
+.legendhint{font-size:10px;color:#849f8b;line-height:1.5;margin-top:13px}
+.footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px;color:#98ad9c;font-size:11px;line-height:1.5}
+.footer a{color:#7ed5a3;text-decoration:underline}
+body.obs .toolbar,body.obs .footer{display:none}
+body.obs .shell{max-width:1800px}
+body.obs .grid{grid-template-columns:minmax(0,2fr) minmax(300px,.6fr)}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}.searchgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.searchgrid .button{align-self:end}.maparea svg{max-height:580px}}
+@media(max-width:680px){.shell{padding:12px}.headerbrand{gap:10px}.logo{width:57px;height:55px}.header h1{font-size:24px}.subtitle{font-size:11px}.searchgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:12px}.stat strong{font-size:23px}.maparea svg{min-height:260px}.panelhead{padding:14px}.legend{padding:12px 14px;gap:9px}.caption{padding:12px 14px}.side{padding:15px}.turnlabel{margin-left:0}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+
+.viewtabs{display:flex;align-items:center;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.viewtab{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:1px solid #385b45;border-radius:11px;background:#12241a;color:#bed3c3;padding:12px 17px;font-size:12px;font-weight:900;letter-spacing:.02em}
+.viewtab.active{background:#076a3f;border-color:#17a368;color:#fff}
+.viewtab:hover{background:#1e4831;color:white}
+body.obs .viewtabs{display:none}
+
+
+body{--red:#efb443;--green:#35b7e0}
+.redkey{background:#efb443}.greenkey{background:#35b7e0}
+.fill.red{background:linear-gradient(90deg,#8f6317,#efb443)}
+.fill.green{background:linear-gradient(90deg,#12647a,#35b7e0)}
+.geo.no-second-round{cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="header">
+  <div class="headerbrand">
+    <div class="logo"><img src="assets/cmg-logo-minimal.jpg" alt="Chapecó Mil Grau" onerror="this.classList.add('broken')"><span class="fallback">CMG</span></div>
+    <div>
+      <div class="overline">CHAPECÓ MIL GRAU · CENTRAL ELEIÇÕES 2026</div>
+      <h1>2º TURNO · GOVERNADOR</h1>
+      <div class="subtitle">Acre · Amazonas · Distrito Federal · Espírito Santo · Rio Grande do Norte · Tocantins · Fonte TSE</div>
+    </div>
+  </div>
+  <div class="toolbar-row"><span id="status" class="status">Iniciando...</span><button id="obsBtn" class="button secondary" type="button">MODO OBS</button></div>
+</header>
+
+<nav class="viewtabs" aria-label="Painéis eleitorais">
+  <a class="viewtab" href="./mapa.html">PRESIDENTE · MAPA DE CALOR</a>
+  <a class="viewtab active" href="./governador.html" aria-current="page">2º TURNO GOVERNADOR</a>
+</nav>
+<div class="toolbar">
+  <div class="toolbar-row">
+    <strong class="turnlabel">2º TURNO GOVERNADOR · 25/10/2026</strong>
+    <button id="refreshBtn" class="button secondary" type="button">↻ ATUALIZAR TSE</button>
+    <span class="micro">Somente as seis UFs com segundo turno</span>
+  </div>
+  <div class="searchgrid">
+    <div class="field"><label for="ufSelect">Estado</label><select id="ufSelect"><option value="">Seis UFs</option></select></div>
+    <div class="field"><label for="cityInput">Buscar cidade</label><input id="cityInput" type="search" list="cityOptions" autocomplete="off" placeholder="Ex.: Chapecó"><datalist id="cityOptions"></datalist></div>
+    <div class="field"><label for="zoneInput">Zona eleitoral</label><input id="zoneInput" type="number" min="1" max="9999" inputmode="numeric" placeholder="Ex.: 35"></div>
+    <div class="field"><label for="sectionInput">Urna / seção</label><input id="sectionInput" type="number" min="1" max="9999" inputmode="numeric" placeholder="Ex.: 120"></div>
+    <button id="searchBtn" class="button primary" type="button">⌕ BUSCAR E APROXIMAR</button>
+    <button id="resetBtn" class="button secondary" type="button">VER BRASIL</button>
+  </div>
+  <div class="searchfoot">
+    <span id="searchHint" class="micro">Carregando cadastro dos municípios...</span>
+    <span class="micro">Para buscar urna, informe município + zona + número da seção.</span>
+  </div>
+</div>
+
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+<section class="stats" aria-label="Resumo da eleição">
+  <div class="stat"><small>2º TURNO GOVERNADOR</small><strong id="nationalLula">6 UFs</strong><div class="micro">Estados e Distrito Federal</div></div>
+  <div class="stat"><small>ESTADOS COM VOTOS</small><strong id="nationalBolso">0/6</strong><div class="micro">Resultados oficiais recebidos</div></div>
+  <div class="stat"><small>ESTADOS TOTALIZADOS</small><strong id="nationalProgress">0/6</strong><div class="micro" id="hintTurn">UFs com 100% de seções</div></div>
+  <div class="stat"><small>ARQUIVOS OFICIAIS</small><strong id="ufCounter">0/6</strong><div class="micro" id="lastUpdate">Ainda não consultado</div></div>
+</section>
+
+<main class="grid">
+  <section class="panel">
+    <div class="panelhead">
+      <div><div class="overline" id="breadcrumb">BRASIL / SEGUNDO TURNO</div><h2 id="mapCaption">Estados com 2º turno de governador</h2></div>
+      <div class="micro">Clique em um dos seis estados para aproximar</div>
+    </div>
+    <div class="maparea" id="mapWrap">
+      <svg id="map" viewBox="0 0 860 760" role="img" aria-label="Mapa interativo do Brasil e dos municípios">
+        <g id="ufLayer"></g>
+        <g id="cityLayer"></g>
+      </svg>
+      <div id="tooltip" class="tooltip" role="tooltip"></div>
+    </div>
+    <div class="legend">
+      <span><i class="key redkey"></i>Candidato 1 à frente</span>
+      <span><i class="key greenkey"></i>Candidato 2 à frente</span>
+      <span><i class="key neutralkey"></i>Empate / sem votos</span>
+      <span style="color:var(--muted)">Cor mais intensa = maior vantagem percentual</span>
+    </div>
+    <div class="caption">
+      <b id="loadProgress">Carregando malha do mapa...</b>
+      <div style="margin-top:5px">Cada município recebe uma única cor pela vantagem percentual entre os dois candidatos ao governo daquela UF. O contorno corresponde ao limite municipal, não à localização dos eleitores. Resultados indisponíveis permanecem neutros.</div>
+    </div>
+  </section>
+  <aside class="panel side">
+    <div id="currentData" class="tag">AGUARDANDO TSE</div>
+    <div class="overline">DETALHAMENTO DA APURAÇÃO</div>
+    <h3 id="detailTitle">Brasil</h3>
+    <div class="subline" id="sourceTime">Selecione uma abrangência para ver os votos</div>
+    <div class="person">
+      <div class="topline"><span style="color:var(--red)" id="lulaName">CANDIDATO 1</span><span id="lulaPct">—</span></div>
+      <div class="votes" id="lulaVotes">— votos</div>
+      <div class="track"><div class="fill red" id="lulaBar"></div></div>
+    </div>
+    <div class="person">
+      <div class="topline"><span style="color:var(--green)" id="bolsoName">CANDIDATO 2</span><span id="bolsoPct">—</span></div>
+      <div class="votes" id="bolsoVotes">— votos</div>
+      <div class="track"><div class="fill green" id="bolsoBar"></div></div>
+    </div>
+    <div class="split"></div>
+    <div class="metrics">
+      <div class="metric"><small>VANTAGEM</small><b id="difference">—</b></div>
+      <div class="metric"><small>SEÇÕES APURADAS</small><b id="counted">—</b></div>
+      <div class="metric" style="grid-column:1/-1"><small>CANDIDATO À FRENTE</small><b id="leader">Sem votos</b></div>
+    </div>
+    <div class="section">
+      <div style="font-weight:900;margin-bottom:6px;color:#89d6ac">PESQUISA POR URNA / SEÇÃO</div>
+      <div id="sectionDetails">Para localizar uma seção, informe a cidade, a zona eleitoral e o número da seção. É possível confirmar a seção no cadastro oficial EA16; os votos da urna exigem leitura do Boletim de Urna, que não é representado por um ponto geográfico neste mapa.</div>
+    </div>
+    <div class="legendhint">Cada disputa estadual usa amarelo para o candidato 1 e azul para o candidato 2, ordenados pelo número na urna. A cor mostra a vantagem real em votos, sem previsões. Estados sem segundo turno ficam escurecidos.</div>
+  </aside>
+</main>
+
+<footer class="footer">
+  <span>Fonte dos votos: <a href="https://resultados.tse.jus.br/" target="_blank" rel="noopener">TSE</a> · Limites municipais: IBGE via <a href="https://github.com/henriquemalvar/br-geojson" target="_blank" rel="noopener">br-geojson</a> · <a href="./index.html">Painel original CMG</a></span>
+  <span><a href="./mapa.html">Voltar ao mapa presidencial</a> · Atualização de estados a cada 2 minutos; cidades sob demanda.</span>
+</footer>
+</div>
+<script src="assets/mapa-governador.js" defer></script>
+</body>
+</html>
