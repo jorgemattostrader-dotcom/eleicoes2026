@@ -95,7 +95,7 @@ function zoomBox(bounds,pad){
   return [cx-w/2,cy-h/2,w,h];
 }
 function tweenView(box){
-  const svg=S("map"),from=state.currentView.slice(),to=box.slice(),ms=680;
+  const svg=S("map"),from=svg.getAttribute("viewBox").trim().split(/\s+/).map(Number),to=box.slice(),ms=680;
   if(state.animateFrame)cancelAnimationFrame(state.animateFrame);
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){
     state.currentView=to;svg.setAttribute("viewBox",to.join(" "));return;
@@ -315,7 +315,7 @@ async function batchMunicipal(uf,force,job){
 async function selectCity(city){
   if(!city)return;
   if(state.uf!==city.uf||!state.geoCities.has(city.uf))await selectUF(city.uf,{city:true});
-  state.city=city;state.uf=city.uf;state.view="city";state.zone=null;state.section=null;state.mapJob++;
+  state.city=city;state.uf=city.uf;state.view="city";state.zone=null;state.section=null;
   S("ufSelect").value=city.uf;S("cityInput").value=city.nome+" / "+city.uf;
   S("zoneInput").value="";S("sectionInput").value="";
   S("breadcrumb").textContent="BRASIL  /  "+UF[city.uf].toUpperCase()+"  /  "+city.nome.toUpperCase();
@@ -359,6 +359,7 @@ async function search(){
   const uf=S("ufSelect").value,cityText=S("cityInput").value.trim(),zoneText=S("zoneInput").value.trim(),sectionText=S("sectionInput").value.trim();
   notice("");
   if(!state.cities.length&&cityText)try{await loadRegistry()}catch(e){notice("Não foi possível consultar índice de municípios: "+e.message,"warn");return}
+  if(!cityText&&(zoneText||sectionText)){notice("Para consultar zona ou urna/seção, informe a cidade.","warn");return}
   let city=cityText?findCity(cityText):null;
   if(cityText&&!city){notice("Município não encontrado. Confira o nome e a UF.","warn");return}
   if(city)await selectCity(city);
