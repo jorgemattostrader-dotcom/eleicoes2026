@@ -1,37 +1,38 @@
 # Chapecó Mil Grau · Central Eleições 2026
 
-Painel de acompanhamento dos resultados oficiais do Tribunal Superior Eleitoral (TSE).
+Painel interativo com resultados oficiais do Tribunal Superior Eleitoral (TSE).
 
 ## Páginas do projeto
 
-- [Painel original](./index.html): cargos e municípios, layout CMG.
-- **[Mapa Eleitoral V1](./mapa.html)**: Brasil inteiro com as 27 unidades da federação e mapa interativo animado.
+- **[Mapa presidencial detalhado](./mapa.html)**: mapa de calor nacional, filtros de estado, cidade, zona, seção e zoom municipal.
+- **[2º turno Governador](./governador.html)**: página separada com as 6 UFs que disputam o segundo turno, resultados por cidade, zona e consulta de seção.
+- [Painel original](./index.html): interface original CMG de resultados por cargo.
+- [Mapa V1 preservado](./mapa-v1.html): versão anterior do mapa presidencial.
 
-## Mapa V1
+## Governador · 25 de outubro de 2026
 
-- Apuração presidencial do **2º turno (25/10/2026)** e comparação com o **1º turno (04/10/2026)**.
-- Cores solicitadas para comparação: vermelho = Lula (13), verde = Flávio Bolsonaro (22).
-- A opacidade é proporcional à **vantagem em pontos percentuais**, não a eleitores por área.
-- Estados sem dados oficiais apurados continuam neutros. **Não há resultados simulados**.
-- Clique/hover no estado, visão nacional, ranking das UFs, tour automático e modo OBS.
-- Dados oficiais EA20 do TSE: arquivo Brasil e 27 arquivos das UFs, atualizados a cada 60 segundos.
-- Mapas geográficos: [br-geojson](https://github.com/henriquemalvar/br-geojson), malha IBGE / licença CC0, copiada para `assets/brasil-estados.geojson`.
-- Funciona como site estático (GitHub Pages ou outro host HTTPS).
+Segundo turno de governador nas 6 UFs confirmadas pelo TSE: **Acre (AC), Amazonas (AM), Distrito Federal (DF), Espírito Santo (ES), Rio Grande do Norte (RN) e Tocantins (TO)**. Não inclua RJ nesta lista: o 2º turno estadual não acontecerá lá em 25/10.
 
-## Como abrir
+- Dados oficiais TSE: https://resultados.tse.jus.br/oficial/ele2026/6260/dados/ac/ac-c0003-e006260-u.json (exemplo AC).
+- O nome dos candidatos e percentuais são extraídos do JSON oficial por UF/cidade/zona, cargo 0003.
+- Amarelo identifica o candidato de menor número na urna e azul o de maior número na urna, independentemente de partido. A opacidade reflete a vantagem em pontos percentuais.
+- As outras 21 UFs aparecem escurecidas e ficam fora da pesquisa do segundo turno de governador.
+- Estados e municípios sem dados apurados ficam neutros. **Nenhum voto simulado**.
+- A consulta por urna/seção valida seu cadastro no EA16; **não mostra votos por seção**. Para isso, é preciso ler e decodificar o Boletim de Urna (BU). Uma urna/seção não possui contorno geográfico próprio.
 
-Quando o GitHub Pages estiver configurado para publicar a pasta raiz de `main`, acessar:
+## Fontes e funcionamento
 
-`https://jorgemattostrader-dotcom.github.io/eleicoes2026/mapa.html`
+- Resultados: https://resultados.tse.jus.br/.
+- Cadastro de municípios: EA12 do TSE (códigos TSE e IBGE); seções: EA16.
+- Geografia de UFs e municípios: https://github.com/henriquemalvar/br-geojson (base do IBGE). O GeoJSON dos estados está salvo em assets/brasil-estados.geojson; as malhas municipais carregam por demanda.
+- Atualização das UFs a cada 2 minutos; municípios por consulta em lote quando o estado é selecionado.
+- O TSE pode ter arquivos ainda sem apuração, restrições de CORS/rede ou falhas temporárias.
 
-Esse é um **endereço previsto**, não uma confirmação de publicação. Alternativamente, sirva a pasta local por um servidor HTTP, como `python3 -m http.server 8000`, e acesse `http://localhost:8000/mapa.html`. O `fetch` do arquivo GeoJSON local requer um servidor HTTP; não abra com `file://`.
+## Publicação
 
-## Fonte e limitações
+Configure em Settings → Pages → Deploy from a branch → main / (root) no repositório. Endereços previstos após a configuração:
 
-A fonte de resultados é `https://resultados.tse.jus.br/oficial/ele2026/{eleicao}/dados/{uf}/{uf}-c0001-e{eleicao6}-u.json`, eleições `6257` (1º turno) e `6258` (2º turno). O arquivo Brasil inclui votação no exterior.
+- https://jorgemattostrader-dotcom.github.io/eleicoes2026/mapa.html
+- https://jorgemattostrader-dotcom.github.io/eleicoes2026/governador.html
 
-O painel consulta os arquivos diretamente pelo navegador. Restrições temporárias de acesso, CORS, conexão ou dados ainda não totalizados podem impedir resultados em alguma UF. Cada UF é uma fotografia do horário de geração indicado no TSE, que pode variar entre UFs. O projeto não prevê nenhum resultado eleitoral e não substitui a fonte oficial.
-
-## Próximas versões
-
-V2: detalhamento municipal ao selecionar uma UF. V3: pesquisa por município, filtros avançados e tratamento operacional de falhas/retries.
+Estes endereços são *previstos*, não foi confirmado se já estão acessíveis. Para teste local, sirva a pasta por HTTP e acesse governador.html.
